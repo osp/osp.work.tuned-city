@@ -3,6 +3,7 @@
  */
 
 var mongoose = require('mongoose');
+var connection = require('./mongo_store').connection;
 
 var Cursor = function(){
     var proto = {
@@ -38,5 +39,5 @@ var models = {
 
 for(var k in models)
 {
-    exports[k] = mongoose.model(k, mongoose.Schema(models[k]));
+    exports[k] = connection.model(k, mongoose.Schema(models[k]));
 }
