@@ -7,8 +7,6 @@ var Media = require('../models').Media;
 var Path = require('../models').Path;
 
 exports.index = function(req, res){
-//     var medias = new Media();
-    var medias = [];
     Media.find({}, function media_find(err, m){
         if(err)
         {
@@ -20,9 +18,8 @@ exports.index = function(req, res){
             for(var i=0; i < m.length; i++)
             {
                 console.log('> '+m[i].url);
-                medias.push(m[i]);
             }
+            res.render('index', { title: 'Index',  medias:m});
         }
     });
-    res.render('index', { title: 'Index',  medias:medias});
 };
