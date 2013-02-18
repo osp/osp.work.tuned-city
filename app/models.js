@@ -2,6 +2,7 @@
  * Models
  */
 
+var mongoose = require('mongoose');
 
 var Cursor = function(){
     var proto = {
@@ -27,4 +28,15 @@ var models = {
         annotation: String,
     },
     
+    Path:{
+        title:String,
+        trackpoints:[Connection]
+    },
+    
 };
+
+
+for(var k in models)
+{
+    exports[k] = mongoose.model(k, mongoose.Schema(models[k]));
+}
