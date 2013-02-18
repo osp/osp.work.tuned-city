@@ -69,3 +69,7 @@ Icon?
 ehthumbs.db
 Thumbs.db
 *.swp
+
+# Various generated files #
+###########################
+*.css
