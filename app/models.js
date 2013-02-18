@@ -36,8 +36,22 @@ var models = {
     
 };
 
+var transforms = {
+    Media: function(doc, ret, options){
+        var oid = ret._id;
+        ret._id = oid.toString();
+    }
+};
+
 
 for(var k in models)
 {
-    exports[k] = connection.model(k, mongoose.Schema(models[k]));
+    var schema = mongoose.Schema(models[k]);
+    if(transforms[k] !== undefined)
+    {
+        schema.set('toObject', {transform:transforms[k]});
+    }
+    var model = connection.model(k, schema);
+    exports[k] = model;
+    
 }
