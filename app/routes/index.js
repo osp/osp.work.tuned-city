@@ -16,11 +16,13 @@ exports.index = function(req, res){
         }
         else
         {
+            console.log('Found medias:');
             for(var i=0; i < m.length; i++)
             {
+                console.log('> '+m[i].url);
                 medias.push(m[i]);
             }
         }
     });
-    res.render('index', { title: 'Index',  media:medias});
+    res.render('index', { title: 'Index',  medias:medias});
 };
