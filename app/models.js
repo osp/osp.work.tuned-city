@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 
 var Cursor = function(){
     var proto = {
-        media:ObjectId,
+        media:mongoose.Schema.ObjectId,
         cursor:Number,
     }
     var ret = Object.create(proto);
@@ -30,7 +30,7 @@ var models = {
     
     Path:{
         title:String,
-        trackpoints:[Connection]
+        trackpoints:[this.Connection]
     },
     
 };
