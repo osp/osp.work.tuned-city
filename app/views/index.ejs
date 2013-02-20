@@ -25,11 +25,19 @@
   </head>
   <body>
     <h1>Tuned City Archive: <%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <h2>Medias</h2>
     <ul>
     <% for(var i=0; i<medias.length; i++) { %>
     <li class="media_item" id="id_<%= medias[i]._id %>"> <%= medias[i].url %> <div class="player"><span class="player-play">play</span><span class="player-pause">pause</span></div></li>
     <% } %>
     </ul>
+    
+    
+    <% for(var i=0; i<paths.length; i++) { %>
+    <div class="path_item" id="id_<%= paths[i]._id %>"> 
+        <%= paths[i] %> 
+    </div>
+    <% } %>
+    
   </body>
 </html>
