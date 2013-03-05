@@ -6,6 +6,7 @@
 var routes = {
     index:{url:'/', req:'./index'},
     media:{url:'/media/:id', req:'./media'},
+    way:{url:'/way/:id', req:'./way'},
 };
 
 
