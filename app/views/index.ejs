@@ -7,37 +7,14 @@
     
     <script src="/javascripts/jquery-1.9.1.min.js"></script>
     <script src="/javascripts/jquery.jplayer.min.js"></script>
+    <script src="/javascripts/d3.v3.min.js"></script>
     <script src="/javascripts/MediaPlayer.js"></script>
-    <script>
-    var medias = {};
-    <% for(var i=0; i<medias.length; i++) { %>
-    medias['id_<%= medias[i]._id %>'] = <%= medias[i] %> ;
-    <% } %>
-    $(document).ready(function(){
-        $('.media_item').each(function(idx, elem){
-            var that = $(elem);
-            var id = that.attr('id');
-            MediaPlayer(that.find('.player').first(), medias[id]);
-        });
-    });
-    </script>
+    <script src="/javascripts/Path.js"></script>
+    <script src="/javascripts/index.js"></script>
     
   </head>
   <body>
     <h1>Tuned City Archive: <%= title %></h1>
-    <h2>Medias</h2>
-    <ul>
-    <% for(var i=0; i<medias.length; i++) { %>
-    <li class="media_item" id="id_<%= medias[i]._id %>"> <%= medias[i].url %> <div class="player"><span class="player-play">play</span><span class="player-pause">pause</span></div></li>
-    <% } %>
-    </ul>
-    
-    
-    <% for(var i=0; i<paths.length; i++) { %>
-    <div class="path_item" id="id_<%= paths[i]._id %>"> 
-        <%= paths[i] %> 
-    </div>
-    <% } %>
-    
+    <div id="tc_wrapper" />
   </body>
 </html>

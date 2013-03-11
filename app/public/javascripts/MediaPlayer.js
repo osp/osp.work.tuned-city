@@ -8,9 +8,12 @@ var MediaPlayer = function(container, media)
     var proto = {
         init:function(container, media){
             var that = this;
+            container.attr('id', 'id_'+media._id);
             this.ready = false;
             this._player = $('<div/>');
+            this._controls = $('<span class="player-play">play</span> <span class="player-pause">pause</span>');
             container.append(this._player);
+            container.append(this._controls);
             this._player.jPlayer({
                 supplied: media.type,
                 solution: "html,flash",

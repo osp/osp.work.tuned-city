@@ -19,21 +19,25 @@ var Path = function(path){
                 var es = ['end', 'start'];
                 for(var e =0;e<es.length; e++)
                 {
-                    var mid = con[e[i]].media;
-                    marray.push(mid);
+                    marray.push(con.start.media._id);
+                    marray.push(con.end.media._id);
                 }
             }
             this.fill_media(marray);
+            this.trackpoints = path.trackpoints;
         },
         fill_media:function(marray){
-            if(marray.length == 0)
+            if(marray.length === 0)
+            {
                 this.medias_ready = true;
+                return;
+            }
             var mid = marray.pop();
             var that = this;
             if(this.medias[mid] === undefined)
             {
                 $.getJSON('/media/'+mid, function(data){
-                    that.media[data._id] = data; 
+                    that.medias[data._id] = data; 
                     that.fill_media(marray);
                 });
             }
@@ -64,7 +68,25 @@ var Path = function(path){
                 players[mid] = MediaPlayer(media_ctnr, this.medias[mid]);
             }
         },
-        
+        layout:function(ctnr_id){
+            var m_containers = {};
+            var that = this;
+            d3.select('#'+ctnr_id)
+                .selectAll('div')
+                .data(that.trackpoints)
+                .enter()
+                .append('div').text(function(con){
+                    return con.annotation;
+                })
+                .selectAll('div')
+                .data(function(con){
+                    return [con.start, con.end];
+                })
+                .enter()
+                .append('div').each(function(cursor){
+                    var mplayer = MediaPlayer($(this), cursor.media);
+                });
+        },
     };
     
     var ret = Object.create(proto);

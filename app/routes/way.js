@@ -22,7 +22,11 @@ exports.way = function(req,res){
                     if(err) { res.send('500', err); }
                     else
                     {
-                        res.send(trackpoints);
+                        res.send({
+                            id:path[0].id,
+                            title:path[0].title,
+                            trackpoints:trackpoints
+                        });
                     }
                 });
             }

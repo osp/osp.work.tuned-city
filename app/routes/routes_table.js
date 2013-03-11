@@ -8,6 +8,7 @@ var routes = {
     media:{url:'/media/:id', req:'./media'},
     poster:{url:'/poster/:id/:timestamp', req:'./media'},
     way:{url:'/way/:id', req:'./way'},
+    config:{url:'/config/:key', req:'./config'},
 };
 
 
