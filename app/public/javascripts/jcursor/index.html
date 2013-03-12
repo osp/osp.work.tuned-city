@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>jcursor</title>
+    <!--<link rel="stylesheet" href="jcursor.css" media="screen"/>-->
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/themes/ui-lightness/jquery-ui.css" media="screen" />
+    <style>
+        #slider {
+            width: 600px;
+        }
+        #spectrogram {
+            position: relative;
+            width: 600px;
+            height: 50px;
+        }
+        .progress {
+            position: absolute;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        .cursor {
+            position: absolute;
+            height: 50px;
+            width: 1px;
+            background-color: red;;
+        }
+        .target {
+            position: absolute;
+            height: 50px;
+            width: 1px;
+            background-color: blue;;
+            display: none;
+        }
+        #spectrogram:hover .target {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Jcursor</h1>
+    <div id="spectrogram">
+        <div class="progress"></div>
+        <div class="cursor"></div>
+        <div class="target"></div>
+        <img src="img/spectrogram.png" />
+    </div>
+    <!--<div id="slider"></div>-->
+    <div id="jp_container_1">
+        <div id="audio"></div>
+        <button class="jp-play">play</button>
+        <button class="jp-pause">pause</button>
+    </div>
+    <script src="../jquery-1.9.1.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
+    <script src="../jquery.jplayer.min.js"></script>
+    <!--<script src="jquery.jcursor.js"></script>-->
+    <script>
+    $(function() {
+        $("#spectrogram").mousemove(function(e) {
+            $(this).find('.target').css("left", e.offsetX);
+        });
+        $("#spectrogram").on("click", function(e) {
+            var sp = $("#audio").data("jPlayer").status.seekPercent;
+            var imgLeft = $(this).offset().left;
+            var clickLeft = e.pageX;
+            var howFarFromLeft = clickLeft - imgLeft;
+            $("#audio").jPlayer("playHead", howFarFromLeft / (600 / 100));
+        });
+
+        // Create the progress slider control
+        $("#slider").slider({
+            animate: "fast",
+            max: 100,
+            range: "min",
+            step: 0.1,
+            value : 0,
+            slide: function(event, ui) {
+                var sp = $("#audio").data("jPlayer").status.seekPercent;
+                if(sp > 0) {
+                    // Move the play-head to the value and factor in the seek percent.
+                    $("#audio").jPlayer("playHead", ui.value * (100 / sp));
+                } else {
+                    // Create a timeout to reset this slider to zero.
+                    setTimeout(function() {
+                        $("#slider").slider("value", 0);
+                    }, 0);
+                }
+            }
+        });
+
+        $("#audio").jPlayer({
+            ready: function () {
+               $(this).jPlayer("setMedia", {
+                   oga: "http://video.constantvzw.org/Radio_la_cage/uitzending-la-cage1.ogg"
+               });
+            },
+            timeupdate: function(event) {
+                $("#slider").slider("value", event.jPlayer.status.currentPercentAbsolute);
+                $(".progress").css('width', 600 / 100 * event.jPlayer.status.currentPercentAbsolute);
+                $(".cursor").css('left', 600 / 100 * event.jPlayer.status.currentPercentAbsolute);
+			},
+            errorAlerts: true,
+            warningAlerts: false,
+            swfPath: "../",
+            supplied: "oga",
+        });
+    });
+    </script>
+</body>
+</html>
