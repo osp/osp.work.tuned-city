@@ -2,90 +2,76 @@
  * Path
  */
 
-
+var PathElement = function(url, media_type, note_prev, note_next){
+    var proto = {
+        init:function(url, media_type, note_prev, note_next){
+            this.url = url;
+            this.media_type = media_type;
+            this.notation = {prev:note_prev, next:note_next};
+            return this;
+        },
+    };
+    
+    return Object.create(proto).init(url, media_type, note_prev, note_next);
+};
 
 var Path = function(path){
+    
+    function _outbound(){};
+    
     var proto = {
+        OUTBOUND: _outbound(),
         init:function(path){
-            this.titles = [];
-            this.medias = {};
-            this.medias_ready = false;
-            var that = this;
-            var marray = [];
-            for(var i =0; i< path.trackpoints.length; i++)
+            this.current_element = 0;
+            this.make_elements(path.trackpoints);
+        },
+        make_elements:function(trackpoints){
+            this.elements = [];
+            for(var i =0; i< trackpoints.length; i++)
             {
-                var con = path.trackpoints[i];
-                this.titles.push(con);
+                var con = trackpoints[i];
                 var es = ['end', 'start'];
-                for(var e =0;e<es.length; e++)
+                var media = con.end.media.url;
+                var type = con.end.media.type;
+                var a_prev = con.annotation;
+                var a_next = null;
+                if(i < (trackpoints.length - 1))
                 {
-                    marray.push(con.start.media._id);
-                    marray.push(con.end.media._id);
+                    a_next = trackpoints[i + 1].annotation;
                 }
-            }
-            this.fill_media(marray);
-            this.trackpoints = path.trackpoints;
-        },
-        fill_media:function(marray){
-            if(marray.length === 0)
-            {
-                this.medias_ready = true;
-                return;
-            }
-            var mid = marray.pop();
-            var that = this;
-            if(this.medias[mid] === undefined)
-            {
-                $.getJSON('/media/'+mid, function(data){
-                    that.medias[data._id] = data; 
-                    that.fill_media(marray);
-                });
-            }
-            else
-            {
-                that.fill_media(marray);
+                this.elements.push(PathElement(media, type, a_prev, a_next));
             }
         },
-        play:function(container, title_idx){
-            if(!this.medias_ready)
-            {
-                var that = this;
-                window.setTimeout(function(){that.play(container, title_idx);}, 500);
-            }
-            title_idx = title_idx || 0;
-            var player_tpl = '\
-            <div class="player-view"></div>\
-            <div class="player-controls">\
-                <span class="player-play">play</span><span class="player-pause">pause</span>\
-            </div>';
-            var players = {};
-            for(var mid in this.medias)
-            {
-                var media_ctnr = $('<div />');
-                media_ctnr.attr('id', 'id_'+mid);
-                media_ctnr.append(player_tpl);
-                container.append(media_ctnr);
-                players[mid] = MediaPlayer(media_ctnr, this.medias[mid]);
-            }
+        begin: function(){
+            this.current_element = 0;
+            return this.current();
         },
-        layout:function(ctnr_id){
-            var m_containers = {};
-            var that = this;
-            d3.select('#'+ctnr_id)
-                .selectAll('div')
-                .data(that.trackpoints)
-                .enter()
-                .append('div').text(function(con){
-                    return con.annotation;
-                })
-                .selectAll('div')
-                .data(function(con){
-                    return [con.start, con.end];
-                })
-                .enter()
-                .append('div').each(function(cursor){
-                    var mplayer = MediaPlayer($(this), cursor.media);
-                });
+        end: function(){
+            this.current_element = this.elements.length - 1;
+            return this.current();
+        },
+        next: function(){
+            var cur = this.current_element + 1;
+            if(cur > (this.elements.length - 1))
+                return null;
+            this.current_element = cur;
+            return this.current();
+        },
+        previous: function(){
+            var cur = this.current_element - 1;
+            if(cur < 0)
+                return null;
+            this.current_element = cur;
+            return this.current();
+        },
+        current: function(){
+            return this.elements[this.current_element];
+        },
+        count: function(){
+            return this.elements.length;
+        },
+        at: function(idx){
+            return this.elements[idx];
         },
     };
     
