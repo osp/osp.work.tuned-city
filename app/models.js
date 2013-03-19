@@ -51,5 +51,17 @@ var Path = mongoose.Schema({
 });
 exports.Path = connection.model('Path', Path);
 
+var Bookmark = mongoose.Schema({
+    note:String,
+    cursor:Cursor()
+});
+exports.Bookmark = Bookmark;
+
+var Shelf = mongoose.Schema({
+    title:String,
+    bookmarks:[Bookmark]
+});
+exports.Shelf = connection.model('Shelf', Shelf);
+
 // might prove usefull 
 exports.mongo_connection = connection;
