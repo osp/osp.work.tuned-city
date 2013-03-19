@@ -1,54 +1,141 @@
-/**
- * This file is part of Tuned City Archive.
- * Copyright 2013 Alexandre Leray, Open Source Publishing
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * Also add information on how to contact you by electronic and paper mail.
- */
+$(function() {
+    /*
+     * objects definition
+     */
+    var Cursor = function(initial) {
+        var proto = {
+            init: function(initial) {
+                this.src = initial.src;
+                this.time = initial.time;
+                this.comment = initial.comment;
+
+                return this;
+            }
+        };
+        
+        return Object.create(proto).init(initial);
+    }
+    
+    /*
+     * utilities
+     */
 
 
-// requires jquery.jplayer.js
+    /**
+     * function relativeOffset (e, [currentTarget])
+     *
+     * Computes the relative offset of an event.
+     *
+     * By default, it is relative to the element the event is
+     * bound to, but one can pass an arbitrary target element.
+     *
+     * Returns an object with top and left attributes.
+     */
+    var relativeOffset = function (e, currentTarget) {
+        var $currentTarget = $(currentTarget || e.currentTarget);
 
-
-(function ($) {
-    "use strict";
-
-    var methods = {
-        init: function (options) {
-            var settings = $.extend({
-            }, options);
-
-
-            return this.each(function (i) {
-                console.log(i);
-            });
-        },
-        destroy: function () {
-            return this.each(function (i) {
-                console.log(i);
-            });
-        }
+        return {
+            top: e.pageY - $currentTarget.offset().top,
+            left: e.pageX - $currentTarget.offset().left,
+        };
     };
 
-    $.fn.jcursor = function (method) {
-        // Method calling logic
-        if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof method === 'object' || ! method) {
-            return methods.init.apply(this, arguments);
+    /*
+     * event handlers
+     */
+    var spectrogramMouseMoved = function(e) {
+        var offsetLeft,
+            $cursorElt;
+
+        offsetLeft = relativeOffset(e).left;
+        $cursorElt = $(this).find('.comment-cursor');
+
+        $(this).find('.target').css("left", offsetLeft);
+        $cursorElt.css("left", offsetLeft - ($cursorElt.width() / 2));
+    }
+
+    var spectrogramClicked = function(e) {
+        var jPlayer = $("#audio").data("jPlayer");
+
+        if (jPlayer.status.paused) {
+            $('#audio').jPlayer("play");
         } else {
-            $.error('Method ' + method + ' does not exist on jquery.jcursor');
+            $("#audio").jPlayer("playHead", relativeOffset(e).left / (600 / 100));
         }
     };
-})(jQuery);
+
+    var commentCursorClicked = function(e) {
+        var jPlayer = $("#audio").data("jPlayer");
+
+        e.stopPropagation();
+
+        var pc = relativeOffset(e, "#spectrogram").left / (600 / 100);
+        var clickedTime = jPlayer.status.duration / 100 * pc;
+        var comment = window.prompt("Your comment");
+
+        var cursor = Cursor({
+            src: jPlayer.status.src, 
+            time: clickedTime, 
+            comment: comment
+        });
+
+        $(this).clone().toggleClass('comment-cursor').toggleClass('comment-cursor-persistant').insertBefore($(this));
+    };
+
+    $("#spectrogram").on('mousemove', spectrogramMouseMoved);
+    $("#spectrogram").on("click", spectrogramClicked);
+    $(".comment-cursor").on("click", commentCursorClicked);
+
+    $("#audio").jPlayer({
+        canplay: function () {
+            loadFixtures();
+        },
+        ready: function () {
+           $(this).jPlayer("setMedia", {
+               oga: "http://video.constantvzw.org/Radio_la_cage/uitzending-la-cage1.ogg"
+           });
+        },
+        timeupdate: function(event) {
+            var currentPercentAbsolute = event.jPlayer.status.currentPercentAbsolute;
+
+            $("#slider").slider("value", currentPercentAbsolute);
+            $(".progress").css('width', 600 / 100 * currentPercentAbsolute);
+            $(".cursor").css('left', 600 / 100 * currentPercentAbsolute);
+        },
+        errorAlerts: true,
+        warningAlerts: false,
+        swfPath: "../",
+        supplied: "oga",
+    });
+
+    var loadFixtures = function () {
+        var jPlayer = $("#audio").data("jPlayer");
+
+        var fixtures = [
+            {
+                src: "http://video.constantvzw.org/Radio_la_cage/uitzending-la-cage1.ogg", 
+                time: 442.30096435546875,
+                comment: "Hello"
+            },
+            {
+                src: "http://video.constantvzw.org/Radio_la_cage/uitzending-la-cage1.ogg", 
+                time: 654.6054272460938, 
+                comment: "world"
+            }
+        ];
+
+        for (var i=0, max=fixtures.length; i < max; i++) {
+            var cursor = Cursor(fixtures[i]);
+            var duration = jPlayer.status.duration;
+            var pc = fixtures[i].time / duration * 100;
+            var left = (pc / 100) * 600;
+
+            $("<div>")
+                .addClass("comment-cursor-persistant")
+                .css('left', left)
+                .appendTo(".comment");
+        }
+    };
+
+
+});
