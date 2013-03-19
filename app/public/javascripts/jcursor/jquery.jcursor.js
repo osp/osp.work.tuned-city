@@ -1,6 +1,6 @@
 $(function() {
     /*
-     * objects definition
+     * Cursor
      */
     var Cursor = function(initial) {
         var proto = {
@@ -8,21 +8,141 @@ $(function() {
                 this.src = initial.src;
                 this.time = initial.time;
                 this.comment = initial.comment;
-
-                return this;
             }
         };
         
-        return Object.create(proto).init(initial);
+        var ret = Object.create(proto);
+        ret.init(initial);
+        return ret;
     }
+
+    /*
+     * Player
+     */
+    var Player = function(elt, src) {
+        var proto = {
+            innerContainerMouseMoved: function (e) {
+                var offsetLeft = relativeOffset(e).left;
+
+                this.ui.target.css("left", offsetLeft);
+                this.ui.commentCursor.css("left", offsetLeft - (this.ui.commentCursor.width() / 2));
+            },
+            innerContainerClicked: function (e) {
+                var data = this.elt.data("jPlayer");
+
+                if (data.status.paused) {
+                    this.elt.jPlayer("play");
+                } else {
+                    this.elt.jPlayer("playHead", relativeOffset(e).left / (600 / 100));
+                }
+            },
+            commentCursorClicked: function (e) {
+                var data = this.elt.data("jPlayer");
+
+                e.stopPropagation();
+
+                var pc = relativeOffset(e, this.ui.innerContainer).left / (600 / 100);
+                var clickedTime = data.status.duration / 100 * pc;
+                var comment = window.prompt("Your comment");
+
+                var cursor = Cursor({
+                    src: data.status.src, 
+                    time: clickedTime, 
+                    comment: comment
+                });
+
+                this.ui.commentCursor
+                    .clone()
+                    .toggleClass('comment-cursor')
+                    .toggleClass('comment-cursor-persistant')
+                    .insertBefore(this.ui.commentCursor);
+            },
+            initPlayer: function () {
+                var that = this;
+
+                var options = {
+                    canplay: function () {
+                        //loadFixtures();
+                    },
+                    ready: function () {
+                       $(this).jPlayer("setMedia", {
+                           oga: that.src
+                       });
+                    },
+                    timeupdate: function(event) {
+                        var currentPercentAbsolute = event.jPlayer.status.currentPercentAbsolute;
+
+                        that.ui.progress.css('width', 600 / 100 * currentPercentAbsolute);
+                        that.ui.cursor.css('left', 600 / 100 * currentPercentAbsolute);
+                    },
+                    cssSelectorAncestor: '.outer',
+                    errorAlerts: true,
+                    warningAlerts: false,
+                    swfPath: "../",
+                    supplied: "oga",
+                };
+
+                this._player = this.elt.jPlayer(options);
+            },
+            initUi: function () {
+                this.ui = {
+                    outerContainer : $('<div>').addClass('outer'),
+                    innerContainer : $('<div>').addClass('spectrogram'),
+                    progress       : $('<div>').addClass('progress'),
+                    cursor         : $('<div>').addClass('cursor'),
+                    target         : $('<div>').addClass('target'),
+                    img            : $('<img>').attr('src', 'img/spectrogram.png'),
+                    comment        : $('<div>').addClass('comment'),
+                    commentCursor  : $('<div>').addClass('comment-cursor'),
+                    play           : $('<button>').addClass('jp-play').text('play'),
+                    pause          : $('<button>').addClass('jp-pause').text('pause')
+                };
+
+                // builds the ui
+                this.ui.comment.append(this.ui.commentCursor);
+
+                this.ui.innerContainer
+                    .append(this.ui.progress)
+                    .append(this.ui.cursor)
+                    .append(this.ui.target)
+                    .append(this.ui.img)
+                    .append(this.ui.comment);
+
+                this.ui.outerContainer = this.elt.wrap(this.ui.outerContainer).parent();
+                this.ui.outerContainer
+                    .prepend(this.ui.innerContainer)
+                    .append(this.ui.play)
+                    .append(this.ui.pause);
+            },
+            init: function (elt, src) {
+                this.elt = $(elt);
+                this.src = src;
+                console.log(this.src);
+
+                this.initUi();
+                this.initPlayer();
+
+                // events binding
+                this.ui.innerContainer.on('mousemove', this.innerContainerMouseMoved.bind(this));
+                this.ui.innerContainer.on("click", this.innerContainerClicked.bind(this));
+                this.ui.commentCursor.on("click", this.commentCursorClicked.bind(this));
+            }
+        };
+        
+        var ret = Object.create(proto);
+        ret.init(elt, src);
+        return ret;
+    }
+
+    window.Player = Player;
     
     /*
-     * utilities
+     * Utilities
      */
 
 
     /**
-     * function relativeOffset (e, [currentTarget])
+     * function relativeOffset (e [, currentTarget])
      *
      * Computes the relative offset of an event.
      *
@@ -40,73 +160,10 @@ $(function() {
         };
     };
 
+
     /*
-     * event handlers
+     * fixtures, for testing purpose
      */
-    var spectrogramMouseMoved = function(e) {
-        var offsetLeft,
-            $cursorElt;
-
-        offsetLeft = relativeOffset(e).left;
-        $cursorElt = $(this).find('.comment-cursor');
-
-        $(this).find('.target').css("left", offsetLeft);
-        $cursorElt.css("left", offsetLeft - ($cursorElt.width() / 2));
-    }
-
-    var spectrogramClicked = function(e) {
-        var jPlayer = $("#audio").data("jPlayer");
-
-        if (jPlayer.status.paused) {
-            $('#audio').jPlayer("play");
-        } else {
-            $("#audio").jPlayer("playHead", relativeOffset(e).left / (600 / 100));
-        }
-    };
-
-    var commentCursorClicked = function(e) {
-        var jPlayer = $("#audio").data("jPlayer");
-
-        e.stopPropagation();
-
-        var pc = relativeOffset(e, "#spectrogram").left / (600 / 100);
-        var clickedTime = jPlayer.status.duration / 100 * pc;
-        var comment = window.prompt("Your comment");
-
-        var cursor = Cursor({
-            src: jPlayer.status.src, 
-            time: clickedTime, 
-            comment: comment
-        });
-
-        $(this).clone().toggleClass('comment-cursor').toggleClass('comment-cursor-persistant').insertBefore($(this));
-    };
-
-    $("#spectrogram").on('mousemove', spectrogramMouseMoved);
-    $("#spectrogram").on("click", spectrogramClicked);
-    $(".comment-cursor").on("click", commentCursorClicked);
-
-    $("#audio").jPlayer({
-        canplay: function () {
-            loadFixtures();
-        },
-        ready: function () {
-           $(this).jPlayer("setMedia", {
-               oga: "http://video.constantvzw.org/Radio_la_cage/uitzending-la-cage1.ogg"
-           });
-        },
-        timeupdate: function(event) {
-            var currentPercentAbsolute = event.jPlayer.status.currentPercentAbsolute;
-
-            $("#slider").slider("value", currentPercentAbsolute);
-            $(".progress").css('width', 600 / 100 * currentPercentAbsolute);
-            $(".cursor").css('left', 600 / 100 * currentPercentAbsolute);
-        },
-        errorAlerts: true,
-        warningAlerts: false,
-        swfPath: "../",
-        supplied: "oga",
-    });
 
     var loadFixtures = function () {
         var jPlayer = $("#audio").data("jPlayer");
@@ -126,6 +183,7 @@ $(function() {
 
         for (var i=0, max=fixtures.length; i < max; i++) {
             var cursor = Cursor(fixtures[i]);
+
             var duration = jPlayer.status.duration;
             var pc = fixtures[i].time / duration * 100;
             var left = (pc / 100) * 600;
@@ -136,6 +194,4 @@ $(function() {
                 .appendTo(".comment");
         }
     };
-
-
 });

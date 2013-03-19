@@ -10,25 +10,16 @@
 
 <body>
     <h1>Jcursor</h1>
-    <div id="spectrogram">
-        <div class="progress"></div>
-        <div class="cursor"></div>
-        <div class="target"></div>
-        <img src="img/spectrogram.png" />
-        <div class="comment">
-            <div class="comment-cursor"></div>
-        </div>
-    </div>
-    <div id="jp_container_1">
-        <div id="audio"></div>
-        <button class="jp-play">play</button>
-        <button class="jp-pause">pause</button>
-    </div>
+    <div id="audio"></div>
+
     <script src="../jquery-1.9.1.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
     <script src="../jquery.jplayer.min.js"></script>
     <script src="jquery.jcursor.js"></script>
     <script>
+    $(function() {
+        Player("#audio", "http://video.constantvzw.org/Radio_la_cage/uitzending-la-cage1.ogg");
+    });
     </script>
 </body>
 </html>
