@@ -50,7 +50,7 @@ exports.post = function(req, res){
                             url:  media_url + media.name,
                             type:media.type.split('/').pop()
                         };
-                        var mm = models.Media(obj);
+                        var mm = new models.Media(obj);
                         mm.save();
                         res.send(mm);
                         }
@@ -58,12 +58,25 @@ exports.post = function(req, res){
                 }
             });
         },
-        Path:function(req, res){},
-        Cursor:function(req, res){},
+        _generic:function(type,req,res){
+            var entity = JSON.parse(req.params.entity);
+            var obj = new models[type](entity);
+            obj.save();
+            res.send(obj);
+        },
     };
     
-    posters[type](req, res);
+    if(posters[type] !== undefined)
+    {
+        posters[type](req, res);
+    }
+    else
+    {
+        posters._generic(type, req, res);
+    }
 };
 
 
-exports.patch = function(req, res){};
+exports.patch = function(req, res){
+    res.send({status:'error', msg:'PATCH not implemented yet'});
+};
