@@ -18,8 +18,8 @@
 $(document).ready(function(){
     $.getJSON('/config/root_way',function(config){
         var pid = config.root_way;
-        $.getJSON('/way/'+pid, function(path_data){
-            var path = Path(path_data);
+        $.getJSON('/api/Path/'+pid, function(path_data){
+            var path = Path(path_data[0]);
             console.log(path);
         });
     });
