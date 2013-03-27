@@ -1,5 +1,9 @@
 /*
  * shelf.js
+ * 
+ *  DEPRECATED 
+ *  use api instaead of this
+ * 
  */
 
 var Shelf = require('../models').Shelf;

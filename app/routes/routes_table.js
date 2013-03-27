@@ -21,7 +21,7 @@ var web = {
     index:{url:'/', req:'./index', verb:'get'},
     poster:{url:'/poster/:id/:timestamp', req:'./media', verb:'get'},
     config:{url:'/config/:key', req:'./config', verb:'get'},
-    shelf:{url:'/shelf/:action/:title?', req:'./shelf', verb:'all'},
+    cross:{url:'/cross/:ca/:cb', req:'./cross', verb:'get'},
 };
 
 var routes = extend(web,api);
