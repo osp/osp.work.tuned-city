@@ -65,8 +65,13 @@ var BookmarkSchema = mongoose.Schema({
 
 var ShelfSchema = mongoose.Schema({
     title:String,
-    bookmarks:[BookmarkSchema]
+    bookmarks:[{type:ObjectId, ref:'Bookmark'}]
 });
+ShelfSchema.pre('init', function(next, doc, query){
+    query.populate('bookmarks');
+    next();
+});
+
 
 
 exports.Cursor = connection.model('Cursor', CursorSchema);
