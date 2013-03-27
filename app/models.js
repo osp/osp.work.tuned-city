@@ -24,7 +24,7 @@ var Cursor = function(media, cursor){
 
 exports.Cursor = Cursor;
 
-var MediaTypes = ['ogv', 'oga', 'mp3'];
+var MediaTypes = ['ogv', 'oga', 'ogg', 'mp3'];
 
 var Media = mongoose.Schema({
     url:String,
