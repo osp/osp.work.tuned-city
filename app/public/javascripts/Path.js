@@ -7,7 +7,7 @@ var PathElement = function(url, media_type, note_prev, note_next){
         init:function(url, media_type, note_prev, note_next){
             this.url = url;
             this.media_type = media_type;
-            this.notation = {prev:note_prev, next:note_next};
+            this.annotation = {prev:note_prev, next:note_next};
             return this;
         },
     };
