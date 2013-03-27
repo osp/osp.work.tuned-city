@@ -11,9 +11,10 @@ var mc = require('./models').mongo_connection;
 var cout = console.log;
 
 cout('Removing Data fron DB');
-Media.remove({});
-Path.remove({});
-Connection.remove({});
+Cursor.remove({},function(err){console.log(err)});
+Media.remove({},function(err){console.log(err)});
+Path.remove({},function(err){console.log(err)});
+Connection.remove({},function(err){console.log(err)});
 cout('> Done');
 
 var medias = [
@@ -32,15 +33,27 @@ for(var i = 0; i < medias.length; i++)
 }
 cout('> Done');
 
+
+cout('Creating Cursors');
+var mongo_cursors ={};
+mongo_cursors.c0 = new Cursor({media:mongo_medias[0], cursor:60});
+mongo_cursors.c1 = new Cursor({media:mongo_medias[1], cursor:180});
+mongo_cursors.c2 = new Cursor({media:mongo_medias[1], cursor:240});
+mongo_cursors.c3 = new Cursor({media:mongo_medias[0], cursor:340});
+for(var k in mongo_cursors)
+{
+    mongo_cursors[k].save();
+}
+cout('> Done');
+
+cout('Creating Connections');
+var con0 = new Connection({start:mongo_cursors.c0, end:mongo_cursors.c1, annotation:'Con #0'});
+var con1 = new Connection({start:mongo_cursors.c2, end:mongo_cursors.c3, annotation:'Con #1'});
+con0.save();
+con1.save();
+cout('> Done');
+
 cout('Creating Path');
-var c0 = Cursor(mongo_medias[0], 60);
-var c1 = Cursor(mongo_medias[1], 180);
-var c2 = Cursor(mongo_medias[1], 240);
-var c3 = Cursor(mongo_medias[0], 340);
-
-var con0 = new Connection({start:c0, end:c1, annotation:'Con #0'});
-var con1 = new Connection({start:c2, end:c3, annotation:'Con #1'});
-
 var p = new Path({title:'Path #0', trackpoints:[con0,con1]});
 p.save();
 cout('> Done');

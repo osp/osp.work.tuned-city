@@ -6,68 +6,74 @@ var mongoose = require('mongoose');
 var connection = require('./mongo_store').connection;
 
 
-var Cursor = function(media, cursor) {
-    var proto = {
-        media:mongoose.Types.ObjectId,
-        cursor:Number,
-    }
-    var ret = Object.create(proto);
-    if(media !== undefined)
-    {
-        ret.media = media._id;
-        if(cursor !== undefined)
-        {
-            ret.cursor = cursor;
-        }
-    }
-    return ret;
-};
+var ObjectId = mongoose.Schema.ObjectId
 
 
 var MediaTypes = ['ogv', 'oga', 'ogg', 'mp3'];
 
-
-var Media = mongoose.Schema({
+var MediaSchema = mongoose.Schema({
     url:String,
     type:{type:String, enum:MediaTypes}
 });
 
-Media.set('toObject', {transform: function(doc, ret, options){
+MediaSchema.set('toObject', {transform: function(doc, ret, options){
     var oid = ret._id;
     ret._id = oid.toString();
 }});
 
+var CursorSchema = mongoose.Schema({
+    media:{type:ObjectId, ref:'Media' },
+    cursor:Number,
+});
+CursorSchema.pre('init', function(next, doc, query){
+    query.populate('media');
+    next();
+    //     return doc;
+});
 
-var Connection = mongoose.Schema({
-    start:Cursor(),
-    end:Cursor(),
+
+
+var ConnectionSchema = mongoose.Schema({
+    start:{type:ObjectId, ref:'Cursor'},
+    end:{type:ObjectId, ref:'Cursor'},
     annotation: String,
 });
+ConnectionSchema.pre('init', function(next, doc, query){
+    query.populate('start').populate('end');
+    next();
+});
 
 
-var Path = mongoose.Schema({
+
+var PathSchema = mongoose.Schema({
     title: String,
-    trackpoints: [Connection]
+    trackpoints: [{type:ObjectId, ref:'Connection'}]
+});
+PathSchema.pre('init', function(next, doc, query){
+    query.populate('trackpoints');
+    next();
 });
 
 
-var Bookmark = mongoose.Schema({
+
+
+var BookmarkSchema = mongoose.Schema({
     note:String,
-    cursor:Cursor()
+    cursor:{type:ObjectId, ref:'Cursor'}
 });
 
 
-var Shelf = mongoose.Schema({
+var ShelfSchema = mongoose.Schema({
     title:String,
-    bookmarks:[Bookmark]
+    bookmarks:[BookmarkSchema]
 });
 
 
-exports.Cursor = Cursor;
-exports.Media = connection.model('Media', Media);
-exports.Connection = connection.model('Connection', Connection);
-exports.Path = connection.model('Path', Path);
-exports.Bookmark = Bookmark;
-exports.Shelf = connection.model('Shelf', Shelf);
+exports.Cursor = connection.model('Cursor', CursorSchema);
+exports.Media = connection.model('Media', MediaSchema);
+exports.Connection = connection.model('Connection', ConnectionSchema);
+exports.Path = connection.model('Path', PathSchema);
+exports.Bookmark = connection.model('Bookmark', BookmarkSchema);
+exports.Shelf = connection.model('Shelf', ShelfSchema);
 // might prove usefull 
 exports.mongo_connection = connection;
