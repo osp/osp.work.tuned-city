@@ -5,7 +5,7 @@
 
 var routes = {
     index:{url:'/', req:'./index', verb:'get'},
-    media:{url:'/media/:id', req:'./media'},
+    media:{url:'/media/:id', req:'./media', verb:'get'},
     poster:{url:'/poster/:id/:timestamp', req:'./media', verb:'get'},
     way:{url:'/way/:id', req:'./way', verb:'get'},
     config:{url:'/config/:key', req:'./config', verb:'get'},
