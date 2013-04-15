@@ -19,8 +19,9 @@ $(document).ready(function(){
     $.getJSON('/config/root_way',function(config){
         var pid = config.root_way;
         $.getJSON('/api/Path/'+pid, function(path_data){
-            var path = Path(path_data[0]);
-            console.log(path);
+            var path = tc.Path(path_data[0]);
+            var player = tc.MediaPlayer("#audio");
+            player.loadPath(path);
         });
     });
 });

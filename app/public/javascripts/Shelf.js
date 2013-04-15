@@ -2,15 +2,17 @@
  * Shelf.js
  */
 
+window.tc = window.tc || {};
 
-var Bookmark = function(media_id, time, comment)
+
+tc.Bookmark = function(media_id, time, comment)
 {
     var proto = {
         init: function(media_id, time, comment) {
             this.media = media_id;
             this.time = time;
             this.comment = comment;
-        }
+        },
         // Prepare it to return to mongoose model Bookmark
         toJSON:function(){
             return JSON.stringify({
@@ -29,7 +31,7 @@ var Bookmark = function(media_id, time, comment)
 }
 
 
-var Shelf = function(title)
+tc.Shelf = function(title)
 {
     var proto = {
         init: function(title) {
@@ -46,9 +48,9 @@ var Shelf = function(title)
         },
         add: function(media_id, time, comment){
             var item = $('<div class="shelf-item">'+comment+'</div>');
-            var bookmark = Bookmark(media_id, time, comment);
+            var bookmark = tc.Bookmark(media_id, time, comment);
             item.on('click', {bookmark:bookmark}, function(evt){
-                var b
+                console.log('Shelf.on.click('+evt.data.bookmark.media+')');
             });
         },
         element:function(){

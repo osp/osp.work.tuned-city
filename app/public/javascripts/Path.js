@@ -2,7 +2,9 @@
  * Path
  */
 
-var PathElement = function(url, media_type, note_prev, note_next){
+window.tc = window.tc || {};
+
+tc.PathElement = function(url, media_type, note_prev, note_next){
     var proto = {
         init:function(url, media_type, note_prev, note_next){
             this.url = url;
@@ -15,12 +17,11 @@ var PathElement = function(url, media_type, note_prev, note_next){
     return Object.create(proto).init(url, media_type, note_prev, note_next);
 };
 
-var Path = function(path){
+tc.Path = function(path){
     
     function _outbound(){};
     
     var proto = {
-        OUTBOUND: _outbound(),
         init:function(path){
             this.current_element = 0;
             this.make_elements(path.trackpoints);
@@ -39,7 +40,7 @@ var Path = function(path){
                 {
                     a_next = trackpoints[i + 1].annotation;
                 }
-                this.elements.push(PathElement(media, type, a_prev, a_next));
+                this.elements.push(tc.PathElement(media, type, a_prev, a_next));
             }
         },
         begin: function(){
