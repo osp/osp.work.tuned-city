@@ -1,0 +1,72 @@
+#slider {
+    width: 600px;
+}
+
+.spectrogram {
+    position: relative;
+    width: 600px;
+    height: 60px;
+}
+
+.progress {
+    position: absolute;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.cursor {
+    position: absolute;
+    height: 50px;
+    width: 1px;
+    background-color: red;
+}
+
+.target {
+    position: absolute;
+    height: 50px;
+    width: 1px;
+    background-color: blue;
+    display: none;
+}
+
+.comment {
+    position: absolute;
+    top: 50px;
+    width: 600px;
+    height: 10px;
+}
+
+.comment-cursor {
+    position: absolute;
+    top: 0;
+    height: 0px;
+    width: 0px;
+    background-color: blue;
+    -webkit-transition-property: height, width;
+    -webkit-transition-duration: 0.2s;
+}
+
+.comment-cursor-persistant {
+    position: absolute;
+    top: 0;
+    height: 10px;
+    width: 10px;
+    background-color: yellow;
+    outline: 1px solid black;
+}
+
+.comment-cursor-persistant:hover {
+    z-index: 999;
+}
+
+.comment:hover .comment-cursor,
+.spectrogram:hover .target {
+    display: block;
+}
+
+.comment:hover .comment-cursor {
+    height: 10px;
+    width: 10px;
+    -webkit-transition-property: height, width;
+    -webkit-transition-duration: 0.2s;
+}
