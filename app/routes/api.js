@@ -20,7 +20,12 @@ exports.get = function(req, res){
         else
         {
             if(m.length > 0)
-                res.send(m);
+            {
+                if(req.params.id)
+                    res.send(m[0]);
+                else
+                    res.send(m);
+            }
             else
                 res.send('404', 'Could not find *it* on this server');
         }
@@ -59,7 +64,7 @@ exports.post = function(req, res){
             });
         },
         _generic:function(type,req,res){
-            var entity = JSON.parse(req.params.entity);
+            var entity = req.body;
             var obj = new models[type](entity);
             obj.save();
             res.send(obj);
