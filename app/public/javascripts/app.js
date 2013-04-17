@@ -20,11 +20,11 @@ window.tc = window.tc || {};
     };
     
     var proto = {
-        setPath: function(pid_or_obj){
-            if(typeof pid_or_obj === 'string')
-                this._setPathId(pid_or_obj);
+        setPath: function(pid_or_elts){
+            if(typeof pid_or_elts === 'string')
+                this._setPathId(pid_or_elts);
             else
-                this._setPathObject(pid_or_obj);
+                this._setPathElements(pid_or_elts);
         },
         _setPathId:function(pid){
             var that = this;
@@ -34,8 +34,11 @@ window.tc = window.tc || {};
                 }
             });
         },
-        _setPathObject:function(pobj){
-            this.current_path = tc.Path(pobj);
+        _setPathElements:function(elts){
+            this.current_path = tc.Path('-NN-', {
+                data:elts,
+                fetch:false
+            });
             this.player.loadPath(this.current_path);
         },
     };

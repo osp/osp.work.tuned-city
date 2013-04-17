@@ -30,17 +30,23 @@ tc.Bookmark = function(id, options)
         },
         fetch: function(){
             var that = this;
-            $.getJSON('/api/Bookmark/'+this.id, function(data){
-                that.data = data;
-                if(that.options.onDataComplete)
-                {
-                    if(typeof that.options.onDataComplete === 'function')
-                        that.options.onDataComplete.apply(that, [data]);
-                    else
-                        that.options.onDataComplete.f.apply(that.options.onDataComplete.o, [data])
-                }
-                that.render();
-            });
+            tc.app.R.r([
+                        ['Bookmark', '_id'],
+                        ['Cursor', 'cursor'],
+                        ['Media','media']
+                        ],
+                        {_id:that.id},
+                        function(data){
+                            that.data = data;
+                            if(that.options.onDataComplete)
+                            {
+                                if(typeof that.options.onDataComplete === 'function')
+                                    that.options.onDataComplete.apply(that, [data]);
+                                else
+                                    that.options.onDataComplete.f.apply(that.options.onDataComplete.o, [data])
+                            }
+                            that.render();
+                        });
         },
         render: function(){
             this.elt.html(this.data.note);
@@ -52,24 +58,11 @@ tc.Bookmark = function(id, options)
          *  Forge a path suitable for loading into media player
          */
         makePath:function(){
-            var t0 = _.extend({},this.data.cursor);
-            var t1 = _.extend({},this.data.cursor);
-            t1.cursor = -1;
-            var c0 = {
-                start:t1,
-                end:t0,
-            };
-            var c1 = {
-                start:t0,
-                end:t1,
-            };
-            
-            var p = {
-                title:'FP_'+this.id,
-                trackpoints:[c0, c1],
-            };
-            
-            return p;
+            var d = this.data;
+            var m = d.cursor.media;
+            var ret = [tc.PathElement(m.url, m.type, undefined, undefined, m._id)];
+            console.log(ret);
+            return ret;
         },
     };
     
@@ -112,7 +105,7 @@ tc.Shelf = function(sid, options)
                 for(var i = 0; i < bc; i++)
                 {
                     var b = data.bookmarks[i];
-                    that.add(b._id);
+                    that.add(b);
                 }
                 if(that.options.onDataComplete)
                 {
