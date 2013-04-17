@@ -13,7 +13,7 @@ var api = {
     post:{url:'/api/:type', req:'./api', verb:'post'},
     
     // PATCH
-    patch:{url:'/api/:type/:id', req:'./api', verb:'patch'},
+    put:{url:'/api/:type/:id', req:'./api', verb:'put'},
     
 }
 

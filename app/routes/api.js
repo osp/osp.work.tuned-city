@@ -82,6 +82,22 @@ exports.post = function(req, res){
 };
 
 
-exports.patch = function(req, res){
-    res.send({status:'error', msg:'PATCH not implemented yet'});
+exports.put = function(req, res){
+    var type = req.params.type;
+    
+    var patchers = {
+        _generic:function(type, req, res){
+            var entity = req.body;
+            models[type].update({_id: req.params.id}, entity, { upsert: true });
+        },
+    };
+    
+    if(patchers[type] !== undefined)
+    {
+        patchers[type](req, res);
+    }
+    else
+    {
+        patchers._generic(type, req, res);
+    }
 };

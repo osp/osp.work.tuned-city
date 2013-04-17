@@ -12,6 +12,7 @@ window.tc = window.tc || {};
     function app(){
         this.player = tc.MediaPlayer('#audio');
         this.shelves = tc.Shelves();
+        this.form = tc.Form();
         this.current_path = undefined;
         
         $('body').append(this.shelves.element());

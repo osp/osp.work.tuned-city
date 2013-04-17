@@ -10,14 +10,23 @@ tc.Bookmark = function(id, options)
     var proto = {
         init: function(id, options) {
             this.id = id;
-            this.options = options || {};
+            this.options = _.extend({
+                fetch:true,
+            }, options || {});
             this.elt = $('<div />').addClass('bookmark');
             var that = this;
             this.elt.on('click', function(evt){
                 var path = that.makePath();
                 tc.app.setPath(path);
             });
-            this.fetch();
+            if(this.options.data)
+            {
+                this.data = this.options.data;
+            }
+            if(this.options.fetch)
+            {
+                this.fetch();
+            }
         },
         fetch: function(){
             var that = this;
@@ -62,16 +71,6 @@ tc.Bookmark = function(id, options)
             
             return p;
         },
-        // Prepare it to return to mongoose model Bookmark
-//         toJSON:function(){
-//             return JSON.stringify({
-//                 note:this.comment,
-//                 cursor:{
-//                     media:this.media,
-//                     cursor:this.time
-//                 }
-//             });
-//         }
     };
     
     var ret = Object.create(proto);
@@ -85,7 +84,9 @@ tc.Shelf = function(sid, options)
     var proto = {
         init: function(sid, options) {
             this.id = sid;
-            this.options = options || {};
+            this.options = _.extend({
+                fetch:true,
+            }, options || {});
             this.elements = {
                 box :       $('<div class="shelf-box" />'),
                 titleBox :  $('<div class="shelf-title-box" />'),
@@ -146,7 +147,7 @@ tc.Shelves = function(options)
         init: function(options){
             this.options = options || {};
             this._ui();
-            this.current = undefined;
+            this._current = undefined;
             this.shelves = {};
             this.fetch();
         },
@@ -196,12 +197,6 @@ tc.Shelves = function(options)
                 this.shelves[k].render();
             }
         },
-        create: function(sdata){
-            var that = this;
-            $.post('/api/Shelf', sdata, function(rdata){
-                that.add(rdata._id);
-            });
-        },
         add: function(sid){
             var menuItem = $('<div />').addClass('shelf-menu-item');
             this.elements.menu.box.append(menuItem);
@@ -218,13 +213,13 @@ tc.Shelves = function(options)
                 if(!menuItem.hasClass('selected'))
                 {
                     $('.shelf-menu-item').removeClass('selected');
-                    if(that.current !== undefined)
+                    if(that._current !== undefined)
                     {
-                        that.current.element().detach();
+                        that._current.element().detach();
                     }
-                    that.current = S;
+                    that._current = S;
                     menuItem.addClass('selected');
-                    that.elements.box.append(that.current.element());
+                    that.elements.box.append(that._current.element());
                 }
             });
             
@@ -232,6 +227,9 @@ tc.Shelves = function(options)
         element:function(){
             return this.elements.box;
         },
+        current:function(){
+            return this._current;
+        }
     };
     
     var ret = Object.create(proto);
