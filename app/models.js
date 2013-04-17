@@ -61,7 +61,10 @@ var BookmarkSchema = mongoose.Schema({
     note:String,
     cursor:{type:ObjectId, ref:'Cursor'}
 });
-
+BookmarkSchema.pre('init', function(next, doc, query){
+    query.populate('cursor');
+    next();
+});
 
 var ShelfSchema = mongoose.Schema({
     title:String,

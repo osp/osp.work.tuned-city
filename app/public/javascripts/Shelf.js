@@ -12,6 +12,11 @@ tc.Bookmark = function(id, options)
             this.id = id;
             this.options = options || {};
             this.elt = $('<div />').addClass('bookmark');
+            var that = this;
+            this.elt.on('click', function(evt){
+                var path = that.makePath();
+                tc.app.setPath(path);
+            });
             this.fetch();
         },
         fetch: function(){
@@ -33,6 +38,29 @@ tc.Bookmark = function(id, options)
         },
         element:function(){
             return this.elt;
+        },
+        /*
+         *  Forge a path suitable for loading into media player
+         */
+        makePath:function(){
+            var t0 = _.extend({},this.data.cursor);
+            var t1 = _.extend({},this.data.cursor);
+            t1.cursor = -1;
+            var c0 = {
+                start:t1,
+                end:t0,
+            };
+            var c1 = {
+                start:t0,
+                end:t1,
+            };
+            
+            var p = {
+                title:'FP_'+this.id,
+                trackpoints:[c0, c1],
+            };
+            
+            return p;
         },
         // Prepare it to return to mongoose model Bookmark
 //         toJSON:function(){
