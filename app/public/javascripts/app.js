@@ -32,8 +32,8 @@ window.tc = window.tc || {};
             });
         },
         _setPathObject:function(pobj){
-            this.current_path = tc.Path(path_data);
-            this.player.loadPath(that.current_path);
+            this.current_path = tc.Path(pobj);
+            this.player.loadPath(this.current_path);
         },
     };
     
