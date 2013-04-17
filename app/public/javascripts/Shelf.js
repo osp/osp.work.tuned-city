@@ -25,6 +25,7 @@ tc.Bookmark = function(id, options)
                     else
                         that.options.onDataComplete.f.apply(that.options.onDataComplete.o, [data])
                 }
+                that.render();
             });
         },
         render: function(){
@@ -58,14 +59,14 @@ tc.Shelf = function(sid, options)
             this.id = sid;
             this.options = options || {};
             this.elements = {
-                box :       $('<div class="shelf-box">'),
-                titleBox :  $('<div class="shelf-title-box">'),
+                box :       $('<div class="shelf-box" />'),
+                titleBox :  $('<div class="shelf-title-box" />'),
                 title :     $('<div class="shelf-title" />'),
-                itemsBox :  $('<div class="shelf-items-box">'),
+                itemsBox :  $('<div class="shelf-items-box" />'),
             };
             this.elements.titleBox.append(this.elements.title);
             this.elements.box.append(this.elements.titleBox);
-            this.elements.box.append(this.elements.items);
+            this.elements.box.append(this.elements.itemsBox);
             
             this.bookmarks = {};
             this.fetch();
@@ -79,7 +80,7 @@ tc.Shelf = function(sid, options)
                 for(var i = 0; i < bc; i++)
                 {
                     var b = data.bookmarks[i];
-                    that.add(b);
+                    that.add(b._id);
                 }
                 if(that.options.onDataComplete)
                 {
