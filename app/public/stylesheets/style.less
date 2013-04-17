@@ -11,17 +11,25 @@
 }
 
 body {
-  padding: 10px;
-  font: 14px "osp-din", Helvetica, Arial, sans-serif;
+  font-family: 'Carrois Gothic', sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  color: #444;
 }
 
 a {
   color: #00B7FF;
 }
 
-h1 {
-    font-size: 2em;
+h1, h2, h3 {
+    margin-bottom: 18px;
 }
+
+h1, h3 {
+    color: gold;
+}
+
 
 #audio {
     display: inline-block;
@@ -32,65 +40,52 @@ button {
     padding: 0;
     margin: 0;
     background-color: transparent;
-    font: 14px "osp-din", Helvetica, Arial, sans-serif;
-
-    border: 1px solid black;
-    height: 50px;
-    width: 50px;
-    -moz-border-radius: 25px;
-    border-radius: 25px;
+    font-family: 'Carrois Gothic', sans-serif;
+    font-size: 13px;
+    line-height: 18px;
 }
 
+button:hover {
+    background-color: rgb(122, 151, 170);
+    color: white;
+}
 
-@shelfHeight:122px;
+input[type="text"] {
+    outline: 1px solid black;
+    border: none;
+}
 
 .shelf-top-box{
-    position:absolute;
-    bottom:0;
-    left:0;
-    height:@shelfHeight;
-    width:100%;
-    border-top:1px solid gray;
-    
     .shelf-box{
-        position:absolute;
-        left:122px;
-        right:122px;
-        height:@shelfHeight;
-        overflow:auto;
-        background-color:#eee;
-        
         .shelf-title-box{
             display:none;
         }
     }
     
     .shelf-menu-box{
-        position:absolute;
-        height:@shelfHeight;
-        width:122px;
-        bottom:0;
-        left:0;
-        overflow:auto;
-        border-right:1px solid gray;
+        text-align: left;
         .shelf-menu-item{
             cursor:pointer;
             &:hover{
-                color:gray;
+                color: black;
             }
             &.selected{
-                background-color:black;
+                background-color: rgb(122, 151, 170);
                 color:white;
             }
         }
     }
     .shelf-create-box{
-        position:absolute;
-        bottom:0;
-        right:0;
-        height:@shelfHeight;
-        width:122px;
-        border-left:1px solid gray;
+        margin-bottom: 18px;
     }
-    
+}
+
+button {
+    padding: 3px;
+}
+.next {
+    margin-left: 18px;
+}
+.previous {
+    margin-right: 18px;
 }

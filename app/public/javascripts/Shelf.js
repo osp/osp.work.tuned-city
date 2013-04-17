@@ -158,14 +158,14 @@ tc.Shelves = function(options)
         },
         _ui:function(){
             this.elements = { 
-                box : $('<div />').addClass('shelf-top-box'),
+                box : $('.ui-layout-east').addClass('shelf-top-box'),
                 menu: {
                     box:$('<div />').addClass('shelf-menu-box'),
                 },
                 create : {
                     box: $('<div />').addClass('shelf-create-box'),
                     input: $('<input type="text" />').addClass('shelf-create-input'),
-                    submit: $('<div>create</div>').addClass('shelf-create-submit'),
+                    submit: $('<button>create</button>').addClass('shelf-create-submit'),
                 },
             };
             this.elements.create.box
@@ -173,10 +173,10 @@ tc.Shelves = function(options)
                 .append(this.elements.create.submit);
             
             this.elements.box
-                .append(this.elements.menu.box);
+                .append(this.elements.create.box);
             
             this.elements.box
-                .append(this.elements.create.box);
+                .append(this.elements.menu.box);
             
             var that = this;
             this.elements.create.submit.on('click', function(evt){
