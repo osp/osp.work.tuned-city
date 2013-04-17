@@ -15,13 +15,23 @@
         //         });
         //     });
 
+        
+var app = {};
+
+
 $(document).ready(function(){
+    
+    app.player = tc.MediaPlayer("#audio");
+    app.current_path = undefined;
+    app.shelves = tc.Shelves();
+    
+    $('body').append(app.shelves.element());
+    
     $.getJSON('/config/root_way',function(config){
         var pid = config.root_way;
         $.getJSON('/api/Path/'+pid, function(path_data){
-            var path = tc.Path(path_data[0]);
-            var player = tc.MediaPlayer("#audio");
-            player.loadPath(path);
+            app.current_path = tc.Path(path_data);
+            app.player.loadPath(app.current_path);
         });
     });
 });
