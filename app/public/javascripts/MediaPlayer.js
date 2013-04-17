@@ -87,11 +87,13 @@ tc.MediaPlayer = function(elt)
             
             this.ui.outerContainer = this.elt.wrap(this.ui.outerContainer).parent();
             this.ui.outerContainer
-            .prepend(this.ui.innerContainer)
+            .prepend(this.ui.previous)
+            .append(this.ui.next)
             .append(this.ui.play)
             .append(this.ui.pause)
-            .append(this.ui.previous)
-            .append(this.ui.next);
+            .append(this.ui.innerContainer);
+
+            this.ui.previous.next().andSelf().next().andSelf().wrapAll('<div>');
             
             this.ui.next.on('click', this.playNext.bind(this));
             this.ui.previous.on('click', this.playPrevious.bind(this));
@@ -143,6 +145,10 @@ tc.MediaPlayer = function(elt)
             this.resetPlayer(node.media_type);
             var media = {};
             var that = this;
+            console.log(node);
+
+            $('h2').text('Currently watching ' + node.url);
+
             media[node.media_type] = node.url;
             $.getJSON('/spectrogram/' + node.media_id + '/', function(data) {
                 that.ui.img.attr('src', data.url);
