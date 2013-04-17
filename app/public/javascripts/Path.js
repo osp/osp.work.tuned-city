@@ -4,17 +4,18 @@
 
 window.tc = window.tc || {};
 
-tc.PathElement = function(url, media_type, note_prev, note_next){
+tc.PathElement = function(url, media_type, note_prev, note_next, media_id){
     var proto = {
-        init:function(url, media_type, note_prev, note_next){
+        init:function(url, media_type, note_prev, note_next, media_id){
             this.url = url;
+            this.media_id = media_id;
             this.media_type = media_type;
             this.annotation = {prev:note_prev, next:note_next};
             return this;
         },
     };
     
-    return Object.create(proto).init(url, media_type, note_prev, note_next);
+    return Object.create(proto).init(url, media_type, note_prev, note_next, media_id);
 };
 
 tc.Path = function(path){
@@ -34,13 +35,14 @@ tc.Path = function(path){
                 var es = ['end', 'start'];
                 var media = con.end.media.url;
                 var type = con.end.media.type;
+                var media_id = con.end.media._id;
                 var a_prev = con.annotation;
                 var a_next = null;
                 if(i < (trackpoints.length - 1))
                 {
                     a_next = trackpoints[i + 1].annotation;
                 }
-                this.elements.push(tc.PathElement(media, type, a_prev, a_next));
+                this.elements.push(tc.PathElement(media, type, a_prev, a_next, media_id));
             }
         },
         begin: function(){

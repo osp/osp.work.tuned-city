@@ -66,7 +66,7 @@ tc.MediaPlayer = function(elt)
                 progress       : $('<div>').addClass('progress'),
                 cursor         : $('<div>').addClass('cursor'),
                 target         : $('<div>').addClass('target'),
-                img            : $('<img>').attr('src', 'img/spectrogram.png'),
+                img            : $('<img>'),
                 comment        : $('<div>').addClass('comment'),
                 commentCursor  : $('<div>').addClass('comment-cursor'),
                 play           : $('<button>').addClass('jp-play').text('Play'),
@@ -142,8 +142,16 @@ tc.MediaPlayer = function(elt)
         setNode:function(node){
             this.resetPlayer(node.media_type);
             var media = {};
+            var that = this;
             media[node.media_type] = node.url;
-            this.elt.jPlayer('setMedia', media);
+            $.getJSON('/spectrogram/' + node.media_id + '/', function(data) {
+                that.ui.img.attr('src', data.url);
+            });
+
+            $.getJSON('/poster/' + node.media_id + '/', function(data) {
+                media['poster'] = data.url
+                that.elt.jPlayer('setMedia', media);
+            });
         },
         playCurrent:function(){
             var node = this.currentPath.current();
