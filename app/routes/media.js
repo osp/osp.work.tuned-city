@@ -31,17 +31,15 @@ exports.poster = function(req, res){
         }
         else
         {
-            var fn = req.params.id + "_" + req.params.timestamp + ".jpg",
+            var timestamp = req.params.timestamp || 0;
+            var fn = req.params.id + "_" + timestamp + ".jpg",
                 path = __dirname + '/../public/posters/' + fn;
 
             if (fs.existsSync(path)) {
                 res.send('<img src="/posters/' + fn + '" />');
             } else {
-                exec('ffmpeg -i /tmp/saturdaytimelapse.ogv -ss ' + req.params.timestamp + ' -vcodec mjpeg -vframes 1 -f image2 ' + path,
+                exec('ffmpeg -i ' + m[0].url + ' -ss ' + timestamp + ' -vcodec mjpeg -vframes 1 -f image2 ' + path,
                     function (error, stdout, stderr) {
-                        console.log('stdout: ' + stdout);
-                        console.log('stderr: ' + stderr);
-
                         if (error !== null) {
                             console.log('exec error: ' + error);
                         } else {
