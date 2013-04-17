@@ -98,7 +98,10 @@ tc.Shelf = function(sid, options)
             this.elements.box.append(this.elements.itemsBox);
             
             this.bookmarks = {};
-            this.fetch();
+            if(this.options.fetch)
+            {
+                this.fetch();
+            }
         },
         fetch: function(){
             var that = this;
@@ -145,7 +148,9 @@ tc.Shelves = function(options)
 {
     var proto = {
         init: function(options){
-            this.options = options || {};
+            this.options = _.extend({
+                fetch:true,
+            }, options || {});
             this._ui();
             this._current = undefined;
             this.shelves = {};

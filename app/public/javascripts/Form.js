@@ -64,14 +64,15 @@ tc.Form = function()
                        $.post('/api/Bookmark', { note:comment.val(), cursor:cdata._id },
                               function(bdata){
                                   $.getJSON('/api/Shelf/'+shelf.val(), function(sdata){
-                                      var rdata = _.extend({},sdata);
+                                      var rdata = _.omit(sdata,'_id','__v');
                                       rdata.bookmarks.push(bdata._id);
                                       $.ajax('/api/Shelf/'+sdata._id,{
                                           type:'PUT',
+                                          dataType: 'json',
                                           contentType: 'application/json',
-                                          data: rdata,
+                                          data: JSON.stringify(rdata),
                                           success: function(data){
-                                              tc.shelves.current().add(bdata._id);
+                                              tc.app.shelves.current().add(bdata._id);
                                         }
                                     });
                                 });
