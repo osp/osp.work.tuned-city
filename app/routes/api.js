@@ -6,6 +6,7 @@ var models = require('../models');
 var _utils_ = require('../lib/utils');
 var settings = require('../settings').settings;
 var fs = require('fs');
+var _ = require('underscore');
 
 exports.get = function(req, res){
     var type = req.params.type;
@@ -88,7 +89,16 @@ exports.put = function(req, res){
     var patchers = {
         _generic:function(type, req, res){
             var entity = req.body;
-            models[type].update({_id: req.params.id}, entity, { upsert: true });
+            models[type].update({_id: req.params.id},
+                                entity, 
+                                { upsert: true }, 
+                                function(err, numberAffected, raw){
+                                    if(err) { res.send('500', _.extend(err,{entity:entity})); }
+                                    else
+                                    {
+                                        res.send(raw);
+                                    }
+                                });
         },
     };
     

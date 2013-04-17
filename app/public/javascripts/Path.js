@@ -18,32 +18,67 @@ tc.PathElement = function(url, media_type, note_prev, note_next, media_id){
     return Object.create(proto).init(url, media_type, note_prev, note_next, media_id);
 };
 
-tc.Path = function(path){
-    
-    function _outbound(){};
+tc.Path = function(path, options){
     
     var proto = {
-        init:function(path){
+        init:function(id, options){
+            this.options = _.extend({
+                fetch:true,
+            }, options || {});
+            this.id = id;
             this.current_element = 0;
-            this.make_elements(path.trackpoints);
-        },
-        make_elements:function(trackpoints){
             this.elements = [];
-            for(var i =0; i< trackpoints.length; i++)
+            
+            if(this.options.data)
             {
-                var con = trackpoints[i];
-                var es = ['end', 'start'];
-                var media = con.end.media.url;
-                var type = con.end.media.type;
-                var media_id = con.end.media._id;
-                var a_prev = con.annotation;
-                var a_next = null;
-                if(i < (trackpoints.length - 1))
-                {
-                    a_next = trackpoints[i + 1].annotation;
-                }
-                this.elements.push(tc.PathElement(media, type, a_prev, a_next, media_id));
+                this.elements = this.options.data;
             }
+            if(this.options.fetch)
+            {
+                this.fetch();
+            }
+        },
+        fetch:function(){
+            var that = this;
+            
+            tc.app.R.r('Path', this.id, function(pdata){
+                var trackpoints = pdata.trackpoints;
+                var trackpoints_remain = trackpoints.length;
+                for(var i =0; i< trackpoints.length; i++)
+                {
+                    var con = trackpoints[i];
+                    tc.app.R.r('Connection', con, function(cdata){
+                        tc.app.R.r('Cursor', cdata.end, function(enddata){
+                            tc.app.R.r('Cursor', cdata.start, function(startdata){
+                                tc.app.R.r('Media', enddata.media, function(mediadata){
+                                    var a_prev = cdata.annotation;
+                                    var a_next = null;
+    //                                  if(i < (trackpoints.length - 1))
+    //                                  {
+    //                                      a_next = trackpoints[i + 1].annotation;
+    //                                  }
+                                    that.elements.push(tc.PathElement(mediadata.url,
+                                                                    mediadata.type, 
+                                                                    a_prev, 
+                                                                    a_next, 
+                                                                    enddata.media));
+                                    trackpoints_remain -= 1;
+                                    if(trackpoints_remain <= 0)
+                                    {
+                                        if(that.options.onDataComplete)
+                                        {
+                                            if(typeof that.options.onDataComplete === 'function')
+                                                that.options.onDataComplete.apply(that, [that.elements]);
+                                            else
+                                                that.options.onDataComplete.f.apply(that.options.onDataComplete.o, [that.elements])
+                                        }
+                                    }
+                                });
+                            });
+                        });
+                    });
+                }
+            });
         },
         begin: function(){
             this.current_element = 0;
@@ -79,6 +114,6 @@ tc.Path = function(path){
     };
     
     var ret = Object.create(proto);
-    ret.init(path);
+    ret.init(path, options);
     return ret;
 };

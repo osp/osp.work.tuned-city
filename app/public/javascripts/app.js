@@ -13,6 +13,7 @@ window.tc = window.tc || {};
         this.player = tc.MediaPlayer('#audio');
         this.shelves = tc.Shelves();
         this.form = tc.Form();
+        this.R = tc.Resolver();
         this.current_path = undefined;
         
         $('body').append(this.shelves.element());
@@ -27,9 +28,10 @@ window.tc = window.tc || {};
         },
         _setPathId:function(pid){
             var that = this;
-            $.getJSON('/api/Path/'+pid, function(path_data){
-                that.current_path = tc.Path(path_data);
-                that.player.loadPath(that.current_path);
+            that.current_path = tc.Path(pid, {
+                onDataComplete:function(e){
+                    that.player.loadPath(that.current_path);
+                }
             });
         },
         _setPathObject:function(pobj){

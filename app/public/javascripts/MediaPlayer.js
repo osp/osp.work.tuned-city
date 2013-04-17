@@ -120,12 +120,18 @@ tc.MediaPlayer = function(elt)
             
             var pc = relativeOffset(e, this.ui.innerContainer).left / (600 / 100);
             var clickedTime = data.status.duration / 100 * pc;
-            var comment = window.prompt("Your comment");
+//             var comment = window.prompt("Your comment");
             
-            var cursor = Cursor({
-                src: data.status.src, 
-                time: clickedTime, 
-                comment: comment
+//             var cursor = Cursor({
+//                 src: data.status.src, 
+//                 time: clickedTime, 
+//                 comment: comment
+//             });
+//             
+            this.elt.jPlayer('pause');
+            tc.app.form.open('bookmark', {
+                time:clickedTime,
+                media:this.currentPath.current().media_id,
             });
             
             this.ui.commentCursor
