@@ -69,10 +69,10 @@ tc.MediaPlayer = function(elt)
                 img            : $('<img>').attr('src', 'img/spectrogram.png'),
                 comment        : $('<div>').addClass('comment'),
                 commentCursor  : $('<div>').addClass('comment-cursor'),
-                play           : $('<button>').addClass('jp-play').text('play'),
-                pause          : $('<button>').addClass('jp-pause').text('pause'),
-                next           : $('<div>Next</div>').addClass('next'),
-                previous       : $('<div>Previous</div>').addClass('previous'),
+                play           : $('<button>').addClass('jp-play').text('Play'),
+                pause          : $('<button>').addClass('jp-pause').text('Pause'),
+                next           : $('<button>').addClass('next').text('Next'),
+                previous       : $('<button>').addClass('previous').text('Previous'),
             };
             
             // builds the ui
