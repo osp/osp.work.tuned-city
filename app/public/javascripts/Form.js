@@ -56,7 +56,7 @@ tc.Form = function()
             var media = form.find('.form-media');
             var time = form.find('.form-time');
             var shelf = form.find('.form-shelf');
-            var comment = form.find('.form-shelf');
+            var comment = form.find('.form-comment');
             
             // first create a cursor
             $.post('/api/Cursor', { media:media.val(), cursor:time.val() },
