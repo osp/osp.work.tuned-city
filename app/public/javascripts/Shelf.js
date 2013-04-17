@@ -5,11 +5,12 @@
 window.tc = window.tc || {};
 
 
-tc.Bookmark = function(id)
+tc.Bookmark = function(id, options)
 {
     var proto = {
-        init: function(id) {
+        init: function(id, options) {
             this.id = id;
+            this.options = options || {};
             this.elt = $('<div />').addClass('bookmark');
             this.fetch();
         },
@@ -17,6 +18,13 @@ tc.Bookmark = function(id)
             var that = this;
             $.getJSON('/api/Bookmark/'+this.id, function(data){
                 that.data = data;
+                if(that.options.onDataComplete)
+                {
+                    if(typeof that.options.onDataComplete === 'function')
+                        that.options.onDataComplete.apply(that, [data]);
+                    else
+                        that.options.onDataComplete.f.apply(that.options.onDataComplete.o, [data])
+                }
             });
         },
         render: function(){
@@ -38,16 +46,17 @@ tc.Bookmark = function(id)
     };
     
     var ret = Object.create(proto);
-    ret.init(id);
+    ret.init(id, options);
     return ret;
 }
 
 
-tc.Shelf = function(sid)
+tc.Shelf = function(sid, options)
 {
     var proto = {
-        init: function(sid) {
+        init: function(sid, options) {
             this.id = sid;
+            this.options = options || {};
             this.elements = {
                 box :       $('<div class="shelf-box">'),
                 titleBox :  $('<div class="shelf-title-box">'),
@@ -64,12 +73,20 @@ tc.Shelf = function(sid)
         fetch: function(){
             var that = this;
             $.getJSON('/api/Shelf/'+this.id, function(data){
+                that.data = data;
                 that.elements.title.text(data.title);
                 var bc = data.bookmarks.length;
                 for(var i = 0; i < bc; i++)
                 {
                     var b = data.bookmarks[i];
                     that.add(b);
+                }
+                if(that.options.onDataComplete)
+                {
+                    if(typeof that.options.onDataComplete === 'function')
+                        that.options.onDataComplete.apply(that, [data]);
+                    else
+                        that.options.onDataComplete.f.apply(that.options.onDataComplete.o, [data])
                 }
             });
         },
@@ -90,17 +107,48 @@ tc.Shelf = function(sid)
     };
     
     var ret = Object.create(proto);
-    ret.init(sid);
+    ret.init(sid, options);
     return ret;
 }
 
-tc.Shelves = function()
+tc.Shelves = function(options)
 {
     var proto = {
-        init: function(){
-            this.elements = { box : $('<div class="shelf-top-box">') };
+        init: function(options){
+            this.options = options || {};
+            this._ui();
+            this.current = undefined;
             this.shelves = {};
             this.fetch();
+        },
+        _ui:function(){
+            this.elements = { 
+                box : $('<div />').addClass('shelf-top-box'),
+                menu: {
+                    box:$('<div />').addClass('shelf-menu-box'),
+                },
+                create : {
+                    box: $('<div />').addClass('shelf-create-box'),
+                    input: $('<input type="text" />').addClass('shelf-create-input'),
+                    submit: $('<div>create</div>').addClass('shelf-create-submit'),
+                },
+            };
+            this.elements.create.box
+                .append(this.elements.create.input)
+                .append(this.elements.create.submit);
+            
+            this.elements.box
+                .append(this.elements.menu.box);
+            
+            this.elements.box
+                .append(this.elements.create.box);
+            
+            var that = this;
+            this.elements.create.submit.on('click', function(evt){
+                var name = that.elements.create.input.val();
+                that.create({title:name});
+                that.elements.create.input.val('');
+            });
         },
         fetch: function(){
             var that = this;
@@ -126,9 +174,31 @@ tc.Shelves = function()
             });
         },
         add: function(sid){
-            var S = tc.Shelf(sid);
+            var menuItem = $('<div />').addClass('shelf-menu-item');
+            this.elements.menu.box.append(menuItem);
+            var S = tc.Shelf(sid, {
+                onDataComplete:function(data){
+                    menuItem.html(data.title);
+                }
+            });
             this.shelves[sid] = S;
-            this.elements.box.append(S.element());
+//             this.elements.box.append(S.element());
+            
+            var that = this;
+            menuItem.on('click', function(evt){
+                if(!menuItem.hasClass('selected'))
+                {
+                    $('.shelf-menu-item').removeClass('selected');
+                    if(that.current !== undefined)
+                    {
+                        that.current.element().detach();
+                    }
+                    that.current = S;
+                    menuItem.addClass('selected');
+                    that.elements.box.append(that.current.element());
+                }
+            });
+            
         },
         element:function(){
             return this.elements.box;
@@ -136,6 +206,6 @@ tc.Shelves = function()
     };
     
     var ret = Object.create(proto);
-    ret.init();
+    ret.init(options);
     return ret;
 }
