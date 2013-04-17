@@ -197,6 +197,12 @@ tc.Shelves = function(options)
                 this.shelves[k].render();
             }
         },
+        create: function(sdata){
+            var that = this;
+            $.post('/api/Shelf', sdata, function(rdata){
+                that.add(rdata._id);
+            });
+        },
         add: function(sid){
             var menuItem = $('<div />').addClass('shelf-menu-item');
             this.elements.menu.box.append(menuItem);
