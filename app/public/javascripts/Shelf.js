@@ -178,6 +178,15 @@ tc.Shelves = function(options)
                 that.elements.create.input.val('');
             });
         },
+        get: function(id_or_name){
+            for(var id in this.shelves)
+            {
+                if(id === id_or_name 
+                    || this.shelves[id].data.title === id_or_name)
+                    return this.shelves[id];
+            }
+            return undefined;
+        },
         fetch: function(){
             var that = this;
             $.getJSON('/api/Shelf', function(data){
@@ -195,10 +204,14 @@ tc.Shelves = function(options)
                 this.shelves[k].render();
             }
         },
-        create: function(sdata){
+        create: function(sdata, cb){
             var that = this;
             $.post('/api/Shelf', sdata, function(rdata){
                 that.add(rdata._id);
+                if(cb !== undefined)
+                {
+                    cb.apply(window, [rdata]);
+                }
             });
         },
         add: function(sid){

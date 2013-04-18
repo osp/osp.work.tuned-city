@@ -7,21 +7,72 @@ window.tc = window.tc || {};
 
 tc.Form = function()
 {
+    function createBookmark(media, time, comment, shelf){
+        $.post('/api/Cursor', { media:media, cursor:time },
+               function(cdata){
+                   $.post('/api/Bookmark', { note:comment, cursor:cdata._id },
+                          function(bdata){
+                              $.getJSON('/api/Shelf/'+shelf, function(sdata){
+                                  var rdata = _.omit(sdata,'_id','__v');
+                                  rdata.bookmarks.push(bdata._id);
+                                  $.ajax('/api/Shelf/'+sdata._id,{
+                                      type:'PUT',
+                                      dataType: 'json',
+                                      contentType: 'application/json',
+                                      data: JSON.stringify(rdata),
+                                         success: function(data){
+                                             tc.app.shelves.get(shelf).add(bdata._id);
+                                         }
+                                  });
+                              });
+                          });
+    });
+    };
+    
     var upload = {
-        init:function(form, data){},
-        submit:function(form){},
+        init:function(form, data){
+            var medias = tc.app.shelves.get('medias');
+            if(medias === undefined)
+            {
+                var that = this;
+                tc.app.shelves.create({title:'medias'},
+                    function(sdata){
+                        that.shelf = sdata._id;
+                    });
+            }
+            else{
+                this.shelf = medias.id;
+            }
+            return true;
+        },
+        submit:function(form){
+            var media = form.find('.form-media');
+            var formdata = new FormData();
+            var f = media[0].files[0];
+            var f_name = f.name;
+            console.log('UMT: '+f.type);
+//             return;
+            formdata.append(media.attr('name'), f);
+            var that = this;
+            $.ajax({  
+                url: "/api/Media",  
+                type: "POST",  
+                data: formdata,  
+                processData: false,  
+                contentType: false,  
+                success: function(res) {  
+                    console.log(res);
+                    createBookmark(res._id, 0, 'Origin('+f_name+')', that.shelf);
+                }  
+            });  
+        },
         form:{
-            action : "/api/Media/",
-            enctype : "multipart/form-data",
-            method : "post",
             html :
             [
             {
-                type: "file",
-                name: "media"
-            },
-            {
-                type: "submit"
+                type: 'file',
+                name: 'media',
+                class: 'form-media',
             }
             ]
         }
@@ -42,10 +93,11 @@ tc.Form = function()
             
             if(current_shelf === undefined)
             {
+                alert('You got to select a shelf first.');
                 return false;
             }
             
-            p.html('Insert a bookmark in <stromg>'+current_shelf.data.title+'</strong>');
+            p.html('Insert a bookmark in <strong>'+current_shelf.data.title+'</strong>');
             media.val(data.media);
             time.val(data.time);
             shelf.val(current_shelf.id);
@@ -58,26 +110,7 @@ tc.Form = function()
             var shelf = form.find('.form-shelf');
             var comment = form.find('.form-comment');
             
-            // first create a cursor
-            $.post('/api/Cursor', { media:media.val(), cursor:time.val() },
-                   function(cdata){
-                       $.post('/api/Bookmark', { note:comment.val(), cursor:cdata._id },
-                              function(bdata){
-                                  $.getJSON('/api/Shelf/'+shelf.val(), function(sdata){
-                                      var rdata = _.omit(sdata,'_id','__v');
-                                      rdata.bookmarks.push(bdata._id);
-                                      $.ajax('/api/Shelf/'+sdata._id,{
-                                          type:'PUT',
-                                          dataType: 'json',
-                                          contentType: 'application/json',
-                                          data: JSON.stringify(rdata),
-                                          success: function(data){
-                                              tc.app.shelves.current().add(bdata._id);
-                                        }
-                                    });
-                                });
-                            });
-                });
+            createBookmark(media.val(), time.val(), comment.val(), shelf.val());
         },
         form:{
             html:
@@ -122,6 +155,7 @@ tc.Form = function()
         open: function(template, data){
             var f = forms_proto[template];
             this.e.empty();
+            this.e.attr('title', template+' form');
             this.e.dform(f.form);
             if(!f.init(this.e, data))
             {

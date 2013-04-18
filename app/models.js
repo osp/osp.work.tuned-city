@@ -9,7 +9,7 @@ var connection = require('./mongo_store').connection;
 var ObjectId = mongoose.Schema.ObjectId
 
 
-var MediaTypes = ['ogv', 'oga', 'ogg', 'mp3'];
+var MediaTypes = ['ogv', 'oga', 'ogg', 'mp3', 'mkv', 'mka', 'webmv', 'webma'];
 
 var MediaSchema = mongoose.Schema({
     url:String,

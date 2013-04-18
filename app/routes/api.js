@@ -52,13 +52,30 @@ exports.post = function(req, res){
                         if(err){res.send(err)}
                         else
                         {
-                        var obj = {
-                            url:  media_url + media.name,
-                            type:media.type.split('/').pop()
-                        };
-                        var mm = new models.Media(obj);
-                        mm.save();
-                        res.send(mm);
+                            var t = media.type.split('/');
+                            var mtype = t.pop();
+                            var type = t.pop();
+                            if(mtype === 'webm')
+                            {
+                                if(type === 'video')
+                                    mtype = 'webmv';
+                                else
+                                    mtype = 'webma';
+                            }
+                            if(mtype === 'ogg')
+                            {
+                                if(type === 'video')
+                                    mtype = 'ogv';
+                                else
+                                    mtype = 'oga';
+                            }
+                            var obj = {
+                                url:  media_url + media.name,
+                                type: mtype,
+                            };
+                            var mm = new models.Media(obj);
+                            mm.save();
+                            res.send(mm);
                         }
                     });
                 }
