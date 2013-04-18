@@ -55,6 +55,15 @@ input[type="text"] {
     border: none;
 }
 
+textarea {
+    width: 100%;
+    outline: 1px solid lightgray;
+    border: none;
+    padding: none;
+    margin: none;
+    min-height: 300px;
+}
+
 .shelf-top-box{
     .shelf-box{
         .shelf-title-box{
@@ -83,17 +92,17 @@ input[type="text"] {
 button {
     padding: 3px;
 }
-.next {
-    margin-left: 18px;
-}
-.previous {
-    margin-right: 18px;
-}
-textarea {
-    width: 100%;
-    outline: 1px solid lightgray;
-    border: none;
-    padding: none;
-    margin: none;
-    min-height: 300px;
+#mediaplayer{
+    .next {
+        margin-left: 18px;
+    }
+    .previous {
+        margin-right: 18px;
+    }
+    
+    .upload{
+        position:absolute;
+        bottom:4px;
+        right:4px;
+    }
 }

@@ -38,7 +38,9 @@ exports.poster = function(req, res){
             if (fs.existsSync(path)) {
                 res.send({url: '/posters/' + fn});
             } else {
-                exec('ffmpeg -i ' + m[0].url + ' -ss ' + timestamp + ' -vcodec mjpeg -vframes 1 -f image2 ' + path,
+                var ffmpeg = 'ffmpeg -i ' + m[0].url + ' -ss ' + timestamp + ' -vcodec mjpeg -vframes 1 -f image2 "' + path+'"';
+                console.log('poster: '+ffmpeg);
+                exec(ffmpeg,
                     function (error, stdout, stderr) {
                         if (error !== null) {
                             console.log('exec error: ' + error);
@@ -68,7 +70,7 @@ exports.spectrogram = function(req, res){
             } else {
                 var cmd = [
                     'ffmpeg -y -i ' + m[0].url + ' -ac 2 /tmp/foo.wav',
-                    'svt.py -s ' + path + ' -o 1 -w 600 -h 50 -p 3 /tmp/foo.wav',
+                    'svt.py -s "' + path + '" -o 1 -w 600 -h 50 -p 3 /tmp/foo.wav',
                     'rm /tmp/foo.wav'
                 ];
 

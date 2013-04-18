@@ -7,6 +7,7 @@ var _utils_ = require('../lib/utils');
 var settings = require('../settings').settings;
 var fs = require('fs');
 var _ = require('underscore');
+var slugify = require('slug');
 
 exports.get = function(req, res){
     var type = req.params.type;
@@ -47,7 +48,8 @@ exports.post = function(req, res){
                 if(err){res.send(err)}
                 else
                 {
-                    var newPath =  media_dir + media.name ;
+                    var fname = slugify(media.name);
+                    var newPath =  media_dir + fname ;
                     fs.writeFile(newPath, data, function (err){
                         if(err){res.send(err)}
                         else
@@ -70,7 +72,7 @@ exports.post = function(req, res){
                                     mtype = 'oga';
                             }
                             var obj = {
-                                url:  media_url + media.name,
+                                url:  media_url + fname,
                                 type: mtype,
                             };
                             var mm = new models.Media(obj);

@@ -42,7 +42,7 @@ tc.MediaPlayer = function(elt)
         },
         resetPlayer: function (format) {
             var that = this;
-            
+            this.elt.jPlayer("destroy");
             var options = {
                 timeupdate: function(event) {
                     var currentPercentAbsolute = event.jPlayer.status.currentPercentAbsolute;
@@ -62,7 +62,7 @@ tc.MediaPlayer = function(elt)
         },
         initUi: function () {
             this.ui = {
-                outerContainer : $('<div>').addClass('outer'),
+                outerContainer : $('<div id="mediaplayer" />').addClass('outer'),
                 innerContainer : $('<div>').addClass('spectrogram'),
                 progress       : $('<div>').addClass('progress'),
                 cursor         : $('<div>').addClass('cursor'),
@@ -74,6 +74,7 @@ tc.MediaPlayer = function(elt)
                 pause          : $('<button>').addClass('jp-pause').text('Pause'),
                 next           : $('<button>').addClass('next').text('Next'),
                 previous       : $('<button>').addClass('previous').text('Previous'),
+                upload         : $('<button>').addClass('upload').text('Add Media'),
             };
             
             // builds the ui
@@ -86,6 +87,7 @@ tc.MediaPlayer = function(elt)
             .append(this.ui.img)
             .append(this.ui.comment);
             
+            
             this.ui.outerContainer = this.elt.wrap(this.ui.outerContainer).parent();
             this.ui.outerContainer
             .prepend(this.ui.previous)
@@ -93,12 +95,16 @@ tc.MediaPlayer = function(elt)
             .append(this.ui.innerContainer)
             .append("<br>")
             .append(this.ui.play)
-            .append(this.ui.pause);
+            .append(this.ui.pause)
+            .append(this.ui.upload);
 
             this.ui.previous.next().andSelf().next().andSelf().wrapAll('<div>');
             
             this.ui.next.on('click', this.playNext.bind(this));
             this.ui.previous.on('click', this.playPrevious.bind(this));
+            this.ui.upload.on('click', function(evt){
+                tc.app.form.open('upload');
+            });
         },
         innerContainerMouseMoved: function (e) {
             var offsetLeft = relativeOffset(e).left;
@@ -161,11 +167,18 @@ tc.MediaPlayer = function(elt)
             $.getJSON('/spectrogram/' + node.media_id + '/', function(data) {
                 that.ui.img.attr('src', data.url);
             });
-
-            $.getJSON('/poster/' + node.media_id + '/', function(data) {
-                media['poster'] = data.url
+            var jp = this.elt.data("jPlayer");
+            if(jp.format[node.media_type].media === 'video')
+            {
+                $.getJSON('/poster/' + node.media_id + '/', function(data) {
+                    media['poster'] = data.url
+                    that.elt.jPlayer('setMedia', media);
+                });
+            }
+            else
+            {
                 that.elt.jPlayer('setMedia', media);
-            });
+            }
         },
         playCurrent:function(){
             var node = this.currentPath.current();
