@@ -216,7 +216,10 @@ tc.Shelves = function(options)
         },
         add: function(sid){
             var menuItem = $('<div />').addClass('shelf-menu-item');
+            var menuItemBox = $('<div />').addClass('shelf-menu-item');
             this.elements.menu.box.append(menuItem);
+            this.elements.menu.box.append(menuItemBox);
+            
             var S = tc.Shelf(sid, {
                 onDataComplete:function(data){
                     menuItem.html(data.title);
@@ -236,7 +239,7 @@ tc.Shelves = function(options)
                     }
                     that._current = S;
                     menuItem.addClass('selected');
-                    that.elements.box.append(that._current.element());
+                    menuItemBox.append(that._current.element());
                 }
             });
             
