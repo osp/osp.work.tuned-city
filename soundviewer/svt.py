@@ -31,12 +31,12 @@ except:
     sys.exit (1)
 
 try:
-    import Image
+    from PIL import Image
 except:
     print "\nThe Python Imaging Library is not installed. \n To install in Ubuntu use: \n  sudo apt-get install python-imaging\n"
     sys.exit (1)
 
-import ImageFilter, ImageChops, ImageDraw, ImageColor
+from PIL import ImageFilter, ImageChops, ImageDraw, ImageColor
 
 try:
     import numpy
