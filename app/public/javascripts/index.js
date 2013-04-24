@@ -13,7 +13,7 @@ $(document).ready(function(){
         applyDefaultStyles: false,
         enableCursorHotkey: false,
         east: {
-            size: "220",
+            size: "240",
             fxName: "none",
             fxSpeed: "fast",
             initClosed: false,
