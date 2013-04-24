@@ -1,5 +1,8 @@
 /*
  * MediaPlayer
+ *
+ * Depends:
+ * timecode.js (prototypes extracted from https://github.com/oscarotero/jQuery.media)
  */
 
 window.tc = window.tc || {};
@@ -65,7 +68,7 @@ tc.MediaPlayer = function(elt)
         },
         initUi: function () {
             this.ui = {
-                outerContainer : $('<div id="mediaplayer" />').addClass('outer'),
+                outerContainer : $('<div>').attr('id', 'mediaplayer').addClass('outer'),
                 innerContainer : $('<div>').addClass('spectrogram'),
                 progress       : $('<div>').addClass('progress'),
                 cursor         : $('<div>').addClass('cursor'),
@@ -84,22 +87,22 @@ tc.MediaPlayer = function(elt)
             this.ui.comment.append(this.ui.commentCursor);
             
             this.ui.innerContainer
-            .append(this.ui.progress)
-            .append(this.ui.cursor)
-            .append(this.ui.target)
-            .append(this.ui.img)
-            .append(this.ui.comment);
+                .append(this.ui.progress)
+                .append(this.ui.cursor)
+                .append(this.ui.target)
+                .append(this.ui.img)
+                .append(this.ui.comment);
             
             
             this.ui.outerContainer = this.elt.wrap(this.ui.outerContainer).parent();
             this.ui.outerContainer
-            .prepend(this.ui.previous)
-            .append(this.ui.next)
-            .append(this.ui.innerContainer)
-            .append("<br>")
-            .append(this.ui.play)
-            .append(this.ui.pause)
-            .append(this.ui.upload);
+                .prepend(this.ui.previous)
+                .append(this.ui.next)
+                .append(this.ui.innerContainer)
+                .append("<br>")
+                .append(this.ui.play)
+                .append(this.ui.pause)
+                .append(this.ui.upload);
 
             this.ui.previous.next().andSelf().next().andSelf().wrapAll('<div>');
             
@@ -131,13 +134,6 @@ tc.MediaPlayer = function(elt)
             
             var pc = relativeOffset(e, this.ui.innerContainer).left / (this.getSpectrogramWidth() / 100);
             var clickedTime = data.status.duration / 100 * pc;
-//             var comment = window.prompt("Your comment");
-            
-//             var cursor = Cursor({
-//                 src: data.status.src, 
-//                 time: clickedTime, 
-//                 comment: comment
-//             });
 //             
             this.elt.jPlayer('pause');
             tc.app.form.open('bookmark', {
@@ -146,10 +142,10 @@ tc.MediaPlayer = function(elt)
             });
             
             this.ui.commentCursor
-            .clone()
-            .toggleClass('comment-cursor')
-            .toggleClass('comment-cursor-persistant')
-            .insertBefore(this.ui.commentCursor);
+                .clone()
+                .toggleClass('comment-cursor')
+                .toggleClass('comment-cursor-persistant')
+                .insertBefore(this.ui.commentCursor);
         },
         
         // ...
@@ -162,7 +158,6 @@ tc.MediaPlayer = function(elt)
             this.resetPlayer(node.media_type);
             var media = {};
             var that = this;
-            console.log(node);
 
             $('h2').html('Currently watching: <br />' + node.url);
 
@@ -204,128 +199,3 @@ tc.MediaPlayer = function(elt)
     ret.init(elt);
     return ret;
 }
-
-/**
- * $media jQuery plugin (v.2.1.1)
- *
- * 2012. Created by Oscar Otero (http://oscarotero.com / http://anavallasuiza.com)
- *
- * $media is released under the GNU Affero GPL version 3.
- * More information at http://www.gnu.org/licenses/agpl-3.0.html
- */
-
-/**
- * Extends the String object to convert any number to seconds
- *
- * '00:34'.toSeconds(); // 34
- *
- * @return float The value in seconds
- */
-String.prototype.toSeconds = function () {
-    'use strict';
-
-    var time = this, ms;
-
-    if (/^([0-9]{1,2}:)?[0-9]{1,2}:[0-9]{1,2}(\.[0-9]+)?(,[0-9]+)?$/.test(time)) {
-        time = time.split(':', 3);
-
-        if (time.length === 3) {
-            ms = time[2].split(',', 2);
-            ms[1] = ms[1] || 0;
-
-            return ((((parseInt(time[0], 10) * 3600) + (parseInt(time[1], 10) * 60) + parseFloat(ms[0])) * 1000) + parseInt(ms[1], 10)) / 1000;
-        }
-
-        ms = time[1].split(',', 1);
-        ms[1] = ms[1] || 0;
-
-        return ((((parseInt(time[0], 10) * 60) + parseFloat(ms[0])) * 1000) + parseInt(ms[1], 10)) / 1000;
-    }
-
-    return parseFloat(time).toSeconds();
-};
-
-
-
-/**
- * Extends the String object to convert any number value to seconds
- *
- * '34'.secondsTo('mm:ss'); // '00:34'
- *
- * @param string outputFormat One of the avaliable output formats ('ms', 'ss', 'mm:ss', 'hh:mm:ss', 'hh:mm:ss.ms')
- *
- * @return string The value in the new format
- */
-String.prototype.secondsTo = function (outputFormat) {
-    'use strict';
-
-    return this.toSeconds().secondsTo(outputFormat);
-};
-
-
-
-/**
- * Extends the Number object to convert any number to seconds
- *
- * (23.34345).toSeconds(); // 23.343
- *
- * @return float The value in seconds
- */
-Number.prototype.toSeconds = function () {
-    'use strict';
-
-    return Math.floor(this * 1000) / 1000;
-};
-
-
-/**
- * Extends the Number object to convert any number value to seconds
- *
- * 34.secondsTo('mm:ss'); // '00:34'
- *
- * @param string outputFormat One of the avaliable output formats ('ms', 'ss', 'mm:ss', 'hh:mm:ss', 'hh:mm:ss.ms')
- *
- * @return string The value in the new format
- */
-Number.prototype.secondsTo = function (outputFormat) {
-    'use strict';
-
-    var time = this;
-
-    switch (outputFormat) {
-        case 'ms':
-            return Math.floor(time * 1000);
-
-        case 'ss':
-            return Math.floor(time);
-
-        case 'mm:ss':
-        case 'hh:mm:ss':
-        case 'hh:mm:ss.ms':
-            var hh = '';
-
-            if (outputFormat !== 'mm:ss') {
-                hh = Math.floor(time / 3600);
-                time = time - (hh * 3600);
-                hh += ':';
-            }
-
-            var mm = Math.floor(time / 60);
-            time = time - (mm * 60);
-            mm = (mm < 10) ? ("0" + mm) : mm;
-            mm += ':';
-
-            var ss = time;
-
-            if (outputFormat.indexOf('.ms') === -1) {
-                ss = Math.floor(ss);
-            } else {
-                ss = Math.floor(ss*1000)/1000;
-            }
-            ss = (ss < 10) ? ("0" + ss) : ss;
-
-            return hh + mm + ss;
-    }
-
-    return time;
-};
