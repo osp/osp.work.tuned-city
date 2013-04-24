@@ -40,6 +40,9 @@ tc.MediaPlayer = function(elt)
             this.ui.innerContainer.on("click", this.innerContainerClicked.bind(this));
             this.ui.commentCursor.on("click", this.commentCursorClicked.bind(this));
         },
+        getSpectrogramWidth: function () {
+            return this.ui.innerContainer.width()
+        },
         resetPlayer: function (format) {
             var that = this;
             this.elt.jPlayer("destroy");
@@ -47,8 +50,8 @@ tc.MediaPlayer = function(elt)
                 timeupdate: function(event) {
                     var currentPercentAbsolute = event.jPlayer.status.currentPercentAbsolute;
                     
-                    that.ui.progress.css('width', 600 / 100 * currentPercentAbsolute);
-                    that.ui.cursor.css('left', 600 / 100 * currentPercentAbsolute);
+                    that.ui.progress.css('width', that.getSpectrogramWidth() / 100 * currentPercentAbsolute);
+                    that.ui.cursor.css('left', that.getSpectrogramWidth() / 100 * currentPercentAbsolute);
                     $('.time').text(event.jPlayer.status.currentTime.secondsTo('mm:ss') + ' / ' + event.jPlayer.status.duration.secondsTo('mm:ss'));
                 },
                 cssSelectorAncestor: '.outer',
@@ -118,7 +121,7 @@ tc.MediaPlayer = function(elt)
             if (data.status.paused) {
                 this.elt.jPlayer("play");
             } else {
-                this.elt.jPlayer("playHead", relativeOffset(e).left / (600 / 100));
+                this.elt.jPlayer("playHead", relativeOffset(e).left / (this.getSpectrogramWidth() / 100));
             }
         },
         commentCursorClicked: function (e) {
@@ -126,7 +129,7 @@ tc.MediaPlayer = function(elt)
             
             e.stopPropagation();
             
-            var pc = relativeOffset(e, this.ui.innerContainer).left / (600 / 100);
+            var pc = relativeOffset(e, this.ui.innerContainer).left / (this.getSpectrogramWidth() / 100);
             var clickedTime = data.status.duration / 100 * pc;
 //             var comment = window.prompt("Your comment");
             
