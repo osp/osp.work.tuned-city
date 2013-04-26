@@ -7,9 +7,12 @@
 
 window.tc = window.tc || {};
 
-tc.Bookmark = Backbone.Model.extend({});
-tc.Cursor = Backbone.Model.extend({});
-tc.Connection = Backbone.Model.extend({});
-tc.Path = Backbone.Model.extend({});
-tc.Media = Backbone.Model.extend({});
-tc.Shelf = Backbone.Model.extend({});
+
+(function(undefined){
+    var models = 'Bookmark Cursor Connection Path Media Shelf'.split(' ');
+    _.each(models, function(elt, idx){
+        window.tc[elt] = Backbone.Model.extend({
+            idAttribute: '_id'
+        });
+    });
+})();

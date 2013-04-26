@@ -12,7 +12,8 @@ window.tc = window.tc || {};
         this.shelves = new tc.ShelfCollectionView();
     };
     window.tc.App.prototype.start = function(){
-        this.shelves.collection.fetch({reset:true});
+        this.shelves.collected.fetch({reset:true});
+        $('body').append(this.shelves.el);
     };
 })();
 
