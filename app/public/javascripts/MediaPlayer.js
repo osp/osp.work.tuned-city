@@ -168,10 +168,20 @@ tc.MediaPlayer = function(elt)
             var jp = this.elt.data("jPlayer");
             if(jp.format[node.media_type].media === 'video')
             {
-                $.getJSON('/poster/' + node.media_id + '/', function(data) {
-                    media['poster'] = data.url
-                    that.elt.jPlayer('setMedia', media);
+                // FIXME: Sync request here because calling setMedia a second time
+                // to set the poster stops the video.
+                $.ajax({
+                    type: 'GET',
+                    url: '/poster/' + node.media_id + '/',
+                    dataType: 'json',
+                    success: function(data) {
+                        media['poster'] = data.url
+                    },
+                    data: {},
+                    async: false
                 });
+
+                that.elt.jPlayer('setMedia', media);
             }
             else
             {
