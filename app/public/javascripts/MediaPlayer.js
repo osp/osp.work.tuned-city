@@ -30,41 +30,111 @@ tc.MediaPlayer = function(elt)
     };
     
     var proto = {
-        init: function (elt) {
-            this.elt = $(elt);
-            
-            this.currentPath = undefined;
-            
-            this.initUi();
-//             this.initPlayer();
-            
-            // events binding
-            this.ui.innerContainer.on('mousemove', this.innerContainerMouseMoved.bind(this));
-            this.ui.innerContainer.on("click", this.innerContainerClicked.bind(this));
-            this.ui.commentCursor.on("click", this.commentCursorClicked.bind(this));
-        },
         getSpectrogramWidth: function () {
-            return this.ui.innerContainer.width()
+            return this.ui.innerContainer.width();
         },
         resetPlayer: function (format) {
             var that = this;
-            this.elt.jPlayer("destroy");
-            var options = {
-                timeupdate: function(event) {
-                    var currentPercentAbsolute = event.jPlayer.status.currentPercentAbsolute;
-                    
-                    that.ui.progress.css('width', that.getSpectrogramWidth() / 100 * currentPercentAbsolute);
-                    that.ui.cursor.css('left', that.getSpectrogramWidth() / 100 * currentPercentAbsolute);
-                    $('.time').text(event.jPlayer.status.currentTime.secondsTo('mm:ss') + ' / ' + event.jPlayer.status.duration.secondsTo('mm:ss'));
-                },
-                cssSelectorAncestor: '.outer',
-                errorAlerts: true,
-                warningAlerts: false,
-                swfPath: "./Jplayer.swf",
-                supplied: format,
-            };
             
-            this._player = this.elt.jPlayer(options);
+            this._player = new MediaElementPlayer(this.ui.player, {
+                features: ['playpause','current','progress','duration','volume'],
+                success: function (mediaElement, domObject) {
+                    // add event listener
+                    mediaElement.addEventListener('timeupdate', function(event) {
+                        var currentPercentAbsolute = (100 / this.duration) * this.currentTime;
+
+                        that.ui.progress.css('width', currentPercentAbsolute + '%');
+                        that.ui.cursor.css('left', currentPercentAbsolute + '%');
+
+                        $('.time').text(this.currentTime.secondsTo('mm:ss') + ' / ' + this.duration.secondsTo('mm:ss'));
+                    }, false);
+                }
+            });
+        },
+        loadPath: function(path){
+            this.currentPath = path;
+            var node = this.currentPath.current();
+            this.setNode(node);
+        },
+        setNode:function(node){
+            this.resetPlayer(node.media_type);
+            var media = {};
+            var that = this;
+
+            $('h2').html('Currently watching: <br />' + node.url);
+
+            var annotation = this.currentPath.elements[this.currentPath.current_element].annotation;
+
+            if (annotation.next) {
+                this.ui.next.text(annotation.next);
+            }
+            if (annotation.prev) {
+                this.ui.previous.text(annotation.prev);
+            }
+
+            this._player.setSrc(node.url);
+
+            $.getJSON('/spectrogram/' + node.media_id + '/', function(data) {
+                that.ui.img.attr('src', data.url);
+            });
+
+            $.getJSON('/poster/' + node.media_id + '/', function(data) {
+                that._player.media.poster = data.url
+            });
+        },
+        playCurrent:function(){
+            var node = this.currentPath.current();
+            if (node) {
+                this.setNode(node);
+                this._player.media.play();
+            }
+        },
+        playNext:function(){
+            var node = this.currentPath.next();
+            if (node) {
+                this.setNode(node);
+                this._player.media.play();
+            }
+        },
+        playPrevious:function(){
+            var node = this.currentPath.previous();
+            if (node) {
+                this.setNode(node);
+                this._player.media.play();
+            }
+        },
+        innerContainerMouseMoved: function (e) {
+            var offsetLeft = relativeOffset(e).left;
+            
+            this.ui.target.css("left", offsetLeft);
+            this.ui.commentCursor.css("left", offsetLeft - (this.ui.commentCursor.width() / 2));
+        },
+        innerContainerClicked: function (e) {
+            if (this._player.media.paused) {
+                this._player.media.play();
+            } else {
+                var pc = relativeOffset(e).left / (this.getSpectrogramWidth() / 100);
+                var newTime = (this._player.media.duration / 100) * pc;
+                this._player.media.setCurrentTime(newTime);
+            }
+        },
+        commentCursorClicked: function (e) {
+            e.stopPropagation();
+            
+            var pc = relativeOffset(e, this.ui.innerContainer).left / (this.getSpectrogramWidth() / 100);
+            var clickedTime = this._player.media.duration / 100 * pc;
+
+            this._player.media.pause()
+            tc.app.form.open('bookmark', {
+                time:clickedTime,
+                media:this.currentPath.current().media_id,
+            });
+            
+            this.ui.commentCursor
+                .clone()
+                .toggleClass('comment-cursor')
+                .toggleClass('comment-cursor-persistant')
+                .insertBefore(this.ui.commentCursor);
         },
         initUi: function () {
             this.ui = {
@@ -81,6 +151,7 @@ tc.MediaPlayer = function(elt)
                 next           : $('<button>').addClass('next').text('Next'),
                 previous       : $('<button>').addClass('previous').text('Previous'),
                 upload         : $('<button>').addClass('upload').text('Add Media'),
+                player         : $('#mediaelement-player')
             };
             
             // builds the ui
@@ -112,97 +183,18 @@ tc.MediaPlayer = function(elt)
                 tc.app.form.open('upload');
             });
         },
-        innerContainerMouseMoved: function (e) {
-            var offsetLeft = relativeOffset(e).left;
+        init: function (elt) {
+            this.elt = $(elt);
             
-            this.ui.target.css("left", offsetLeft);
-            this.ui.commentCursor.css("left", offsetLeft - (this.ui.commentCursor.width() / 2));
-        },
-        innerContainerClicked: function (e) {
-            var data = this.elt.data("jPlayer");
+            this.currentPath = undefined;
+             
+            this.initUi();
             
-            if (data.status.paused) {
-                this.elt.jPlayer("play");
-            } else {
-                this.elt.jPlayer("playHead", relativeOffset(e).left / (this.getSpectrogramWidth() / 100));
-            }
-        },
-        commentCursorClicked: function (e) {
-            var data = this.elt.data("jPlayer");
-            
-            e.stopPropagation();
-            
-            var pc = relativeOffset(e, this.ui.innerContainer).left / (this.getSpectrogramWidth() / 100);
-            var clickedTime = data.status.duration / 100 * pc;
-//             
-            this.elt.jPlayer('pause');
-            tc.app.form.open('bookmark', {
-                time:clickedTime,
-                media:this.currentPath.current().media_id,
-            });
-            
-            this.ui.commentCursor
-                .clone()
-                .toggleClass('comment-cursor')
-                .toggleClass('comment-cursor-persistant')
-                .insertBefore(this.ui.commentCursor);
-        },
-        
-        // ...
-        loadPath: function(path){
-            this.currentPath = path;
-            var node = this.currentPath.current();
-            this.setNode(node);
-        },
-        setNode:function(node){
-            this.resetPlayer(node.media_type);
-            var media = {};
-            var that = this;
-
-            $('h2').html('Currently watching: <br />' + node.url);
-
-            media[node.media_type] = node.url;
-            $.getJSON('/spectrogram/' + node.media_id + '/', function(data) {
-                that.ui.img.attr('src', data.url);
-            });
-            var jp = this.elt.data("jPlayer");
-            if(jp.format[node.media_type].media === 'video')
-            {
-                // FIXME: Sync request here because calling setMedia a second time
-                // to set the poster stops the video.
-                $.ajax({
-                    type: 'GET',
-                    url: '/poster/' + node.media_id + '/',
-                    dataType: 'json',
-                    success: function(data) {
-                        media['poster'] = data.url
-                    },
-                    data: {},
-                    async: false
-                });
-
-                that.elt.jPlayer('setMedia', media);
-            }
-            else
-            {
-                that.elt.jPlayer('setMedia', media);
-            }
-        },
-        playCurrent:function(){
-            var node = this.currentPath.current();
-            this.setNode(node);
-            this.elt.jPlayer('play');
-        },
-        playNext:function(){
-            var node = this.currentPath.next();
-            this.setNode(node);
-            this.elt.jPlayer('play');
-        },
-        playPrevious:function(){
-            var node = this.currentPath.previous();
-            this.setNode(node);
-            this.elt.jPlayer('play');
-        },
+            // events binding
+            this.ui.innerContainer.on('mousemove', this.innerContainerMouseMoved.bind(this));
+            this.ui.innerContainer.on("click", this.innerContainerClicked.bind(this));
+            this.ui.commentCursor.on("click", this.commentCursorClicked.bind(this));
+        }
     };
     
     var ret = Object.create(proto);

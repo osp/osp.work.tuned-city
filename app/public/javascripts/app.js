@@ -28,6 +28,7 @@ window.tc = window.tc || {};
         },
         _setPathId:function(pid){
             var that = this;
+            console.log(pid);
             that.current_path = tc.Path(pid, {
                 onDataComplete:function(e){
                     that.player.loadPath(that.current_path);
