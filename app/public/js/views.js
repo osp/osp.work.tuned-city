@@ -35,49 +35,26 @@ window.tc = window.tc || {};
         var elementView = elt + 'View';
         
         window.tc[elementView] = Backbone.View.extend({
-            model:window.tc[elt],
+//             model:window.tc[elt],
             initialize: function() {
-                
-            },
-            populate:function($el)
-            {
-                if(this.collects !== undefined)
+                this.model.on('add', this.render, this);
+                this.model.on('change', this.render, this);
+                if(!this.model.isNew())
                 {
-                    for(var k in this.collects)
-                    {
-                        var _mn = this.collects[k];
-                        var _c = window.tc[_mn + 'Collection'];
-                        var _v = window.tc[_mn + 'View'];
-                        var item_ids = this.model.get(k);
-                        var items = [];
-                        this[k] = items;
-                        
-                        for(var i=0; i < item_ids.length; i++)
-                        {
-                            var id = item_ids[i];
-                            var model = _c.get_item(id);
-                            var view = new _v({model:model});
-                            $el.append(view.el);
-                            view.render();
-                            items.push(view);
-                        };
-                    }
+                    this.render();
                 }
             },
             render: function() {
                 var $el = this.$el;
                 $el.empty();
-                var data = this.model.toJSON();
+                var data = this.model.toJSON(true);
                 
+                console.log('RENDER: '+elt);
+                console.log(data);
                 template.render(elt, this, function(t){
                     $el.html(t(data));
                     var pat = '.'+elt+'Items';
-                    var items = $el.find(pat);
-                    console.log('find("'+pat+'") => '+items.length);
-                    if(items.length > 0)
-                    {
-                        this.populate(items);
-                    }
+//                     var items = $el.find(pat);
                 });
                 
                 return this;
@@ -85,7 +62,6 @@ window.tc = window.tc || {};
         });
     });
     
-    window.tc.ShelfView.prototype.collects = { 'bookmarks': 'Bookmark' };
     
     _.each(models, function(elt, idx){
         var elementView = elt + 'View';
@@ -95,21 +71,35 @@ window.tc = window.tc || {};
         window.tc[collectedView] = Backbone.View.extend({
             initialize: function() {
                 this.collected = window.tc[elementCollection];
-                this.listenTo(this.collected, 'reset', this.render);
+                this.collected.on('reset', this.render, this);
+                this.collected.on('add', this.render_one, this);
+                
+                this.rendered_items = {};
+            },
+            render_one: function(item){
+                var $el = this.$el;
+                var _v = window.tc[elementView];
+                if(this.rendered_items[item.cid])
+                {
+//                     this.rendered_items[item.cid].render();
+                }
+                else
+                {
+                    var itemView = new _v({model:item});
+                    $el.append(itemView.el);
+                    this.rendered_items[item.cid] = itemView;
+                }
+                return this;
             },
             render: function() {
                 var $el = this.$el;
                 $el.empty();
-                
                 template.render(elementCollection, this, function(t){
                     $el.html(t({}));
+                    var self = this;
                     this.collected.each(function( item ) {
-                        var _v = window.tc[elementView];
-                        var itemView = new _v({model:item});
-                        itemView.render();
-                        $el.append(itemView.el);
+                        self.render_one(item);
                     });
-                    
                 });
                 
                 return this;

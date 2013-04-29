@@ -17,9 +17,10 @@ window.tc = window.tc || {};
                 var ret = this.get(id);
                 if(ret)
                     return ret;
-                var m = new this.model( { url:this.url + id });
+//                 var m = new window.tc[elt]();
+                this.add({_id:id});
+                var m = this.get(id);
                 m.fetch();
-                this.add(m);
                 return m;
             }
         });
