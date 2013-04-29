@@ -111,6 +111,12 @@ window.tc.App = function(){
     
     
     window.tc.App.prototype.start = function(){
+        
+        $.getJSON('/config/root_way',function(config){
+            //         var pid = config.root_way;
+            //         tc.app.setPath(pid);
+        });
+        
         this.shelves.collected.fetch({
             reset:true,
         });
