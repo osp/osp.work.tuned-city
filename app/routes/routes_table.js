@@ -19,6 +19,7 @@ var api = {
 
 var web = {
     index:{url:'/', req:'./index', verb:'get'},
+    jquerydynamicimg:{url:'/jquerydynamicimg.html', req:'./jquerydynamicimg', verb:'get'},
     poster:{url:'/poster/:id/:timestamp?', req:'./media', verb:'get'},
     spectrogram:{url:'/spectrogram/:id/', req:'./media', verb:'get'},
     config:{url:'/config/:key', req:'./config', verb:'get'},
