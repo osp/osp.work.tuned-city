@@ -1,7 +1,11 @@
-<div class="shelf-box">
+
     <div class="shelf-title-box">
         <div class="shelf-title"><%- title %></div>
     </div>
-    <div class="ShelfItems">
+    <div class="shelf-items">
+    <% for(var i=0; i < bookmarks.length; i++){ var b = bookmarks[i];%>
+        <div class="Bookmark" id="Bookmark<%= b._id %>">
+        <%- b.note %>
+        </div>
+    <% } %>
     </div>
-</div>

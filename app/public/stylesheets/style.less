@@ -64,28 +64,25 @@ textarea {
     min-height: 300px;
 }
 
-.shelf-top-box{
-    .shelf-box{
-        .shelf-title-box{
-            display:none;
-        }
-    }
-    
-    .shelf-menu-box{
-        text-align: left;
-        .shelf-menu-item{
-            cursor:pointer;
-            &:hover{
-                color: black;
-            }
-            &.selected{
-                background-color: rgb(122, 151, 170);
-                color:white;
-            }
-        }
-    }
+.ShelfCollection{
     .shelf-create-box{
         margin-bottom: 18px;
+    }
+    .Shelf{
+        text-align: left;
+        .shelf-items{
+            .Bookmark{
+                margin-left: 1em;
+                cursor:pointer;
+                &:hover{
+                    color: black;
+                }
+                &.selected{
+                    background-color: rgb(122, 151, 170);
+                    color:white;
+                }
+            }
+        }
     }
 }
 
@@ -105,8 +102,4 @@ button {
         bottom:4px;
         right:4px;
     }
-}
-
-.bookmark {
-    margin-left: 1em;
 }

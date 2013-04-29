@@ -12,15 +12,14 @@ window.tc = window.tc || {};
     var models = 'Bookmark Cursor Connection Path Media Shelf'.split(' ');
     _.each(models, function(elt, idx){
         window.tc[elt] = Backbone.Model.extend({
-            population:{},
             urlRoot: '/api/'+elt+'/',
             idAttribute: '_id',
             initialize: function() {
+                this.population = {};
                 this.on('add', this.populate, this);
                 this.on('change', function(){
                     if(this._populator)
                         this._populator.trigger('change');
-                        console.log('CHANGE '+elt+this.id);
                 }, this);
                 this.populate();
             },
@@ -42,7 +41,7 @@ window.tc = window.tc || {};
                         
                         
                         var self = this;
-                        console.log('populate '+elt+ ' with ' + _mn +'('+item_ids+')');
+//                         console.log('populate '+elt+ ' with ' + _mn +'('+item_ids+')');
                         if(!Array.isArray(item_ids))
                         {
                             this.population[k] = _c.get_item(item_ids).populator(this);
@@ -63,6 +62,7 @@ window.tc = window.tc || {};
                         }
                     }
                 }
+                    
             },
             toJSON:function(populate){
                 var ret = Backbone.Model.prototype.toJSON.apply(this);
@@ -103,43 +103,7 @@ window.tc = window.tc || {};
     
     _.extend(window.tc.Cursor.prototype, {collects:{media: 'Media'}});
     
-    // Path
-    _.extend(window.tc.Path.prototype,{
-        collects : { trackpoints: 'Connection' },
-        current_element: 0,
-        elements: [],
-        begin: function(){
-            this.current_element = 0;
-            return this.current();
-        },
-        end: function(){
-            this.current_element = this.elements.length - 1;
-            return this.current();
-        },
-        next: function(){
-            var cur = this.current_element + 1;
-            if(cur > (this.elements.length - 1))
-                return null;
-            this.current_element = cur;
-            return this.current();
-        },
-        previous: function(){
-            var cur = this.current_element - 1;
-            if(cur < 0)
-                return null;
-            this.current_element = cur;
-            return this.current();
-        },
-        current: function(){
-            return this.elements[this.current_element];
-        },
-        count: function(){
-            return this.elements.length;
-        },
-        at: function(idx){
-            return this.elements[idx];
-        },
-    });
+    _.extend(window.tc.Path.prototype,{ collects : { trackpoints: 'Connection' } });
     
     
     

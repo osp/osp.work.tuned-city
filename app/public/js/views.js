@@ -10,9 +10,9 @@ window.template = _.extend(window.template,{
     base_url: '/js/templates/',
     cache: {},
     render: function(name, el, cb){
+        var that = this;
         if(this.cache[name] === undefined)
         {
-            var that = this;
             $.get(that.base_url+name+'.html', function(html){
                 that.cache[name] = _.template(html);
                 cb.apply(el, [that.cache[name]]);
@@ -35,7 +35,7 @@ window.tc = window.tc || {};
         var elementView = elt + 'View';
         
         window.tc[elementView] = Backbone.View.extend({
-//             model:window.tc[elt],
+            className:elt,
             initialize: function() {
                 this.model.on('add', this.render, this);
                 this.model.on('change', this.render, this);
@@ -46,15 +46,13 @@ window.tc = window.tc || {};
             },
             render: function() {
                 var $el = this.$el;
+                $el.attr('id', elt+this.model.id)
                 $el.empty();
                 var data = this.model.toJSON(true);
                 
-                console.log('RENDER: '+elt);
-                console.log(data);
                 template.render(elt, this, function(t){
                     $el.html(t(data));
-                    var pat = '.'+elt+'Items';
-//                     var items = $el.find(pat);
+//                     var pat = '.'+elt.toLowerCase()+'-items';
                 });
                 
                 return this;
@@ -69,6 +67,7 @@ window.tc = window.tc || {};
         var collectedView = elt + 'CollectionView' ;
         
         window.tc[collectedView] = Backbone.View.extend({
+            className:elementCollection,
             initialize: function() {
                 this.collected = window.tc[elementCollection];
                 this.collected.on('reset', this.render, this);
@@ -79,14 +78,10 @@ window.tc = window.tc || {};
             render_one: function(item){
                 var $el = this.$el;
                 var _v = window.tc[elementView];
-                if(this.rendered_items[item.cid])
-                {
-//                     this.rendered_items[item.cid].render();
-                }
-                else
+                if(this.rendered_items[item.cid] === undefined)
                 {
                     var itemView = new _v({model:item});
-                    $el.append(itemView.el);
+                    $el.append(itemView.render().el);
                     this.rendered_items[item.cid] = itemView;
                 }
                 return this;
@@ -94,9 +89,9 @@ window.tc = window.tc || {};
             render: function() {
                 var $el = this.$el;
                 $el.empty();
+                var self = this;
                 template.render(elementCollection, this, function(t){
                     $el.html(t({}));
-                    var self = this;
                     this.collected.each(function( item ) {
                         self.render_one(item);
                     });
