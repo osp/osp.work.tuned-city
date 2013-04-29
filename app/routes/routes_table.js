@@ -15,7 +15,7 @@ var api = {
     // PATCH
     put:{url:'/api/:type/:id', req:'./api', verb:'put'},
     
-}
+};
 
 var web = {
     index:{url:'/', req:'./index', verb:'get'},
