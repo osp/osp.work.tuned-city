@@ -4,7 +4,7 @@
     </div>
     <div class="shelf-items">
     <% for(var i=0; i < bookmarks.length; i++){ var b = bookmarks[i];%>
-        <div class="Bookmark" id="Bookmark<%= b._id %>">
+        <div class="Bookmark" id="Bookmark_<%= b._id %>">
         <%- b.note %>
         </div>
     <% } %>

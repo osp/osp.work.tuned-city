@@ -7,15 +7,50 @@
 
 window.tc = window.tc || {};
 
-window.tc.App = function(){
-    this.shelves = new tc.ShelfCollectionView();
-};
 
 (function(undefined){
     
-    
-    
-    
+    window.tc.App = function(){
+        this.shelves = new tc.ShelfCollectionView();
+        this.player = tc.MediaPlayer('video');
+        this.current_path = undefined;
+    };
+    _.extend(window.tc.App.prototype, {
+        start: function(){
+            
+            $.getJSON('/config/root_way',function(config){
+                //         var pid = config.root_way;
+                //         tc.app.setPath(pid);
+            });
+            
+            this.shelves.collected.fetch({
+                reset:true,
+            });
+            
+            $('body').append(this.shelves.el);
+        },
+        setPath: function(pid_or_elts){
+            if(typeof pid_or_elts === 'string')
+                this._setPathId(pid_or_elts);
+            else
+                this._setPathElements(pid_or_elts);
+        },
+        _setPathId:function(pid){
+            var that = this;
+            console.log(pid);
+            that.current_path = tc.Path(pid, {
+                onDataComplete:function(e){
+                    that.player.loadPath(that.current_path);
+                }
+            });
+        },
+        _setPathElements:function(elts){
+            this.current_path = new tc.Path({_id:'Bookmark_P'});
+            this.current_path.elements = elts;
+            this.player.loadPath(this.current_path);
+        },
+    });
+ 
     window.tc.PathElement = function(url, media_type, note_prev, note_next, media_id){
         var proto = {
             init:function(url, media_type, note_prev, note_next, media_id){
@@ -36,8 +71,8 @@ window.tc.App = function(){
          *  Forge a path suitable for loading into media player
          */
         makePath:function(){
-            var m = this.population.cursor.population.media; // FIXME ugly
-            var ret = [tc.PathElement(m.url, m.type, undefined, undefined, m._id)];
+            var m = this.populate().population.cursor.populate().population.media; // FIXME ugly
+            var ret = [tc.PathElement(m.get('url'), m.get('type'), undefined, undefined, m.id)];
             return ret;
         },
     });
@@ -108,20 +143,19 @@ window.tc.App = function(){
         },
     });
     
+    _.extend(window.tc.ShelfView.prototype,{
+        events:{
+            'click .Bookmark':'play_bookmark',
+        },
+        play_bookmark:function(evt){
+            console.log(arguments);
+            var id = evt.currentTarget.id.split('_').pop();
+            var bm = tc.BookmarkCollection.get(id);
+            var p = bm.makePath();
+            app.setPath(p);
+        },
+    });
     
-    
-    window.tc.App.prototype.start = function(){
-        
-        $.getJSON('/config/root_way',function(config){
-            //         var pid = config.root_way;
-            //         tc.app.setPath(pid);
-        });
-        
-        this.shelves.collected.fetch({
-            reset:true,
-        });
-        $('body').append(this.shelves.el);
-    };
 })();
 
 

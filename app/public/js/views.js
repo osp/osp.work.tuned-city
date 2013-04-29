@@ -46,7 +46,7 @@ window.tc = window.tc || {};
             },
             render: function() {
                 var $el = this.$el;
-                $el.attr('id', elt+this.model.id)
+                $el.attr('id', elt+ '_' +this.model.id)
                 $el.empty();
                 var data = this.model.toJSON(true);
                 

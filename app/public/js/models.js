@@ -62,7 +62,7 @@ window.tc = window.tc || {};
                         }
                     }
                 }
-                    
+                return this;
             },
             toJSON:function(populate){
                 var ret = Backbone.Model.prototype.toJSON.apply(this);
