@@ -29,7 +29,9 @@
     // Create the defaults once
     var pluginName = "dynamicImg",
         defaults = {
-            propertyName: "value"
+            propertyName: "value",
+            debug: false,
+            callback: undefined,
         };
 
     // The actual plugin constructor
@@ -64,24 +66,31 @@
             $.ajax($(this.element).attr("href"), {
                 dataType: 'json',
                 beforeSend: function () {
-                    console.info("before send...");
-                    ld1 = new loader($(that.element));
+                    that.options.debug && console.info("before send...");
+                    //ld1 = new loader($(that.element));
                 },
                 success: function (data) {
-                    console.info("success...");
-                    console.info(data);
+                    that.options.debug && console.info("success...");
+                    that.options.debug && console.info(data);
 
-                    ld1.stop();
-                    $(that.element).replaceWith($('<img>').attr({
+                    //ld1.stop();
+                    var newElement = $('<img>').attr({
                         src: data.url
-                    }));
+                    })
+                    $(that.element).replaceWith(newElement);
+                    that.element = newElement.get(0);
+
+                    if (that.options.callback && typeof(that.options.callback) === "function") {
+                        that.options.debug && console.info("calling back");
+                        that.options.callback.call(that);
+                    }
 
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
-                    console.error("An error occured: " + xhr.status + " " + thrownError);
+                    that.options.debug && console.error("An error occured: " + xhr.status + " " + thrownError);
                 },
                 complete: function () {
-                    console.info("complete...");
+                    that.options.debug && console.info("complete...");
                 }
             });
         },

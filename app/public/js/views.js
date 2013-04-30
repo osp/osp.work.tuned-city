@@ -69,6 +69,26 @@ window.tc = window.tc || {};
                     $el.html(t(data));
 //                     var pat = '.'+elt.toLowerCase()+'-items';
                 });
+
+                // lazy loads <a rel="embed" />
+                this.$el.find('[rel="embed"]').each(function(i) {
+                    var that = this;
+
+                    $(this).dynamicImg({
+                        callback: function() {
+                            console.log($el);
+                            $el.css({
+                                position: 'relative'
+                            });
+                            $(this.element).css({
+                                position: 'absolute',
+                                left: (i * 10) + "px",
+                                top: (i * 10) + "px",
+                                width: '100px',
+                            });
+                        }
+                    });
+                });
                 
                 return this;
             },

@@ -5,7 +5,8 @@
     <div class="shelf-items">
     <% for(var i=0; i < bookmarks.length; i++){ var b = bookmarks[i];%>
         <div class="Bookmark" id="Bookmark_<%= b._id %>">
-        <%- b.note %>
+            <!--<%- b.note %>-->
+            <a rel="embed" href="/poster/<%- b.cursor.media %>">id</a>
         </div>
     <% } %>
     </div>
