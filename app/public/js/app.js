@@ -14,6 +14,7 @@ window.tc = window.tc || {};
         this.shelves = new tc.ShelfCollectionView();
         this.paths = new tc.PathCollectionView();
         this.player = tc.MediaPlayer('video');
+        this.cw = new tc.ConnectionWidget();
         this.current_path = undefined;
     };
     _.extend(window.tc.App.prototype, {
@@ -24,11 +25,9 @@ window.tc = window.tc || {};
 //                 //         tc.app.setPath(pid);
 //             });
             
-//             this.paths.collected.fetch({ reset:true, });
+            
             var self = this;
-//             this.shelves.collected.on('all',function(en){
-//                 console.log('SE: '+en);
-//             });
+            // this ugly thing to ensure that we have enough dta to actually start
             this.shelves.collected.on('reset', function(){
                 var l = this.length;
                 var maxB = -1;
@@ -46,15 +45,20 @@ window.tc = window.tc || {};
                 this.at(idx).getPopulationReference('bookmarks', function(b){
                     b[b.length-1].getPopulationReference('cursor', function(c){
                         c.getPopulationReference('media', function(m){
-                            self.shelves.collected.on('add', this.render_one, this);
-                            $('body').append(self.shelves.el);
-                            self.shelves.render();
+                            self._start();
                         });
                     });
                 });
             }, this.shelves.collected);
             this.shelves.collected.fetch({ reset:true, });
             
+        },
+        _start:function(){
+            this.shelves.collected.on('add', this.shelves.render_one, this.shelves);
+            $('body').append(this.shelves.el);
+            $('body').append(this.cw.el);
+            this.shelves.render();
+            this.cw.render();
         },
         setPath: function(pid_or_elts){
             if(typeof pid_or_elts === 'string')
@@ -187,6 +191,8 @@ window.tc = window.tc || {};
             });
         },
         postRender:function(data){
+            this.$el.find('.Bookmark').draggable({revert:true});
+            
             return;
             // lazy loads <a rel="embed" />
             this.$el.find('[rel="embed"]').each(function(i) {
