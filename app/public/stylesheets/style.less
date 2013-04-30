@@ -13,6 +13,8 @@ body {
   line-height: @line-height;
   text-align: center;
   color: @color1;
+  padding: @line-height;
+  padding-left: 200 + @line-height;
 }
 
 a {
@@ -28,6 +30,7 @@ h1, h3 {
 }
 
 
+.mejs-container,
 #audio {
     display: inline-block;
 }
@@ -62,11 +65,27 @@ textarea {
 }
 
 .ShelfCollection{
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    width: 200px;
+    background-color: lightgrey;
+    padding: @line-height;
+
     .shelf-create-box{
         margin-bottom: 18px;
     }
     .Shelf{
         text-align: left;
+        .Bookmark {
+
+            &:hover {
+                z-index: 3;  
+                outline: 3px solid blue;
+            }
+        }
         .shelf-menu-item{
             cursor:pointer;
             &:hover{
@@ -77,9 +96,44 @@ textarea {
                 color:white;
             }
         }
+        .shelf-items {
+            margin-left: @line-height;
+
+            img {
+                max-width: 150px;
+            }
+        }
+
+        .count {
+            color: white;
+        }
+
+        .bookmark-title {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            z-index: 2;
+            background-color: white;
+        }
     }
     .shelf-create-box{
         margin-bottom: @line-height;
+    }
+    .Shelf .shelf-items {
+        /*display: none;*/
+    }
+    .Shelf .shelf-title:before {
+        content: "\2192";
+        /*display: inline-block;*/
+        width: 1em;
+    }
+    .Shelf.uncollapsed .shelf-items {
+        display: block;
+    }
+    .Shelf.uncollapsed .shelf-title:before {
+        content: "\2193";
+        display: inline-block;
+        width: 1em;
     }
 }
 

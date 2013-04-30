@@ -81,7 +81,7 @@ tc.Shelf = function(sid, options)
                 fetch:true,
             }, options || {});
             this.elements = {
-                box :       $('<div class="shelf-box" />'),
+                box :       $('<div class="shelf-box bla" />'),
                 titleBox :  $('<div class="shelf-title-box" />'),
                 title :     $('<div class="shelf-title" />'),
                 itemsBox :  $('<div class="shelf-items-box" />'),

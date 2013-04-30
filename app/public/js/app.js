@@ -180,7 +180,11 @@ window.tc = window.tc || {};
     
     _.extend(window.tc.ShelfView.prototype,{
         events:{
+            'click .shelf-title-box':'toggle',
             'click .BookmarkPlay':'play_bookmark',
+        },
+        toggle: function(evt){
+            this.$el.toggleClass('uncollapsed');
         },
         play_bookmark:function(evt){
             console.log(arguments);
@@ -191,24 +195,36 @@ window.tc = window.tc || {};
             });
         },
         postRender:function(data){
-            this.$el.find('.Bookmark').draggable({revert:true});
+            var $el = this.$el;
+            $el.find('.Bookmark').draggable({revert:true, helper: function() {
+                var clone = $(this).clone();
+                clone.appendTo($('body'));
+                return clone;
+            }});
             
-            return;
+            //return;
             // lazy loads <a rel="embed" />
             this.$el.find('[rel="embed"]').each(function(i) {
                 var that = this;
                 
                 $(this).dynamicImg({
                     callback: function() {
-                        console.log($el);
-                        $el.css({
-                            position: 'relative'
+                        var offset = i * 10;
+                        console.log(offset);
+                        var bookmarks = $el.find('.Bookmark');
+                        var len = bookmarks.length
+
+                        $el.find('.shelf-items').css({
+                            position: 'relative',
+                            height: 100 + (length * 10) + 30 + "px"
                         });
-                        $(this.element).css({
-                            position: 'absolute',
-                            left: (i * 10) + "px",
-                            top: (i * 10) + "px",
-                            width: '100px',
+                        bookmarks.each(function(i) {
+                            $(this).css({
+                                position: 'absolute',
+                                left: (i * 10)  + "px",
+                                top: (i * 10) + "px",
+                                height: '100px',
+                            });
                         });
                     }
                 });
