@@ -91,13 +91,33 @@ window.tc = window.tc || {};
                 }
                 return ret;
             },
-            get:function(attr, population){
+            getPopulationReference:function(attr, cb){
+                console.log(elt+'.getPopulationReference #'+attr);
+                if(this.population === undefined
+                    || this.population[attr] === undefined)
+                {
+                    var self = this;
+                    window.setTimeout(function(){
+                        self.getPopulationReference(attr, cb);
+                    }, 300);
+                }
+                else
+                {
+                   var ref = this.population[attr];
+                   cb.apply(this, [ref]);
+                }
+            },
+            get:function(attr, population, cb){
                 ret = Backbone.Model.prototype.get.apply(this, [attr]);
                 if(population 
                     && (this.collects !== undefined) 
-                    && (this.population[attr] !== undefined))
+                    && (this.collects[attr] !== undefined))
                 {
                     ret = this.population[attr];
+                    if(cb)
+                    {
+                        this.getPopulationReference(attr, cb);
+                    }
                 }
                 return ret;
             },

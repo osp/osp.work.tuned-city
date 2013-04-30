@@ -67,29 +67,12 @@ window.tc = window.tc || {};
                 
                 template.render(elt, this, function(t){
                     $el.html(t(data));
-//                     var pat = '.'+elt.toLowerCase()+'-items';
+                    if(this.postRender)
+                    {
+                        this.postRender(data);
+                    }
                 });
 
-                // lazy loads <a rel="embed" />
-                this.$el.find('[rel="embed"]').each(function(i) {
-                    var that = this;
-
-                    $(this).dynamicImg({
-                        callback: function() {
-                            console.log($el);
-                            $el.css({
-                                position: 'relative'
-                            });
-                            $(this.element).css({
-                                position: 'absolute',
-                                left: (i * 10) + "px",
-                                top: (i * 10) + "px",
-                                width: '100px',
-                            });
-                        }
-                    });
-                });
-                
                 return this;
             },
         });
@@ -105,9 +88,6 @@ window.tc = window.tc || {};
             className:elementCollection,
             initialize: function() {
                 this.collected = window.tc[elementCollection];
-                this.collected.on('reset', this.render, this);
-                this.collected.on('add', this.render_one, this);
-                
                 this.rendered_items = {};
             },
             render_one: function(item){
