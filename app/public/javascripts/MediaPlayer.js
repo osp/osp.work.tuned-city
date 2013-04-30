@@ -171,12 +171,14 @@ tc.MediaPlayer = function(elt)
                 .append(this.ui.next)
                 .append(this.ui.innerContainer)
                 .append("<br>")
-                .append(this.ui.play)
-                .append(this.ui.pause)
+                //.append(this.ui.play)
+                //.append(this.ui.pause)
                 .append(this.ui.upload);
 
             this.ui.previous.next().andSelf().next().andSelf().wrapAll('<div>');
             
+            //this.ui.play.on('click', this.playCurrent.bind(this));
+
             this.ui.next.on('click', this.playNext.bind(this));
             this.ui.previous.on('click', this.playPrevious.bind(this));
             this.ui.upload.on('click', function(evt){

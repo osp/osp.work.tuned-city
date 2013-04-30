@@ -6,7 +6,7 @@
     <% for(var i=0; i < bookmarks.length; i++){ var b = bookmarks[i];%>
         <div class="Bookmark" id="Bookmark_<%= b._id %>">
         <div class="BookmarkPlay" id="BookmarkPlay_<%= b._id %>"><%- b.note %></div>
-<!--             <a rel="embed" href="/poster/<%- b.cursor.media %>"><%- b._id %></a> -->
+            <!--<a rel="embed" href="/poster/<%- b.cursor.media._id %>"><%- b._id %></a>-->
         </div>
     <% } %>
     </div>
