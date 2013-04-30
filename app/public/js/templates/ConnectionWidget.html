@@ -1,0 +1,13 @@
+Path title: <input class='title' val="<%- title %>" type="text" />
+<%for(var i=0; i < connections.length; i++){ var conn = connections[i]; %>
+<div class="conn">
+<table>
+<tr>
+<td><span class="annotation"><%- conn.annotation %></span></td>
+<td><div class="in"><%- conn.start.note %></div></td>
+<td><div class="out"><%- conn.end.note %></div></td>
+<td><span class="del" id="Con_<%= conn._id %>">Delete</span></td>
+</tr>
+</table>
+</div>
+<% } %>
