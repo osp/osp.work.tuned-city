@@ -12,6 +12,7 @@ window.tc = window.tc || {};
     
     window.tc.App = function(){
         this.shelves = new tc.ShelfCollectionView();
+        this.paths = new tc.PathCollectionView();
         this.player = tc.MediaPlayer('video');
         this.current_path = undefined;
     };
@@ -23,9 +24,9 @@ window.tc = window.tc || {};
                 //         tc.app.setPath(pid);
             });
             
-            this.shelves.collected.fetch({
-                reset:true,
-            });
+//             this.paths.collected.fetch({ reset:true, });
+            this.shelves.collected.fetch({ reset:true, });
+            
             
             $('body').append(this.shelves.el);
         },
@@ -71,7 +72,8 @@ window.tc = window.tc || {};
          *  Forge a path suitable for loading into media player
          */
         makePath:function(){
-            var m = this.populate().population.cursor.populate().population.media; // FIXME ugly
+            var c = this.get('cursor', true);
+            var m = c.get('media', true);
             var ret = [tc.PathElement(m.get('url'), m.get('type'), undefined, undefined, m.id)];
             return ret;
         },

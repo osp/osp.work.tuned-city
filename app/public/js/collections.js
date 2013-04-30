@@ -17,15 +17,18 @@ window.tc = window.tc || {};
                 var ret = this.get(id);
                 if(ret)
                     return ret;
-//                 var m = new window.tc[elt]();
                 this.add({_id:id});
                 var m = this.get(id);
-                m.fetch();
+                m.fetch({
+                    success:function(){
+                        m.populate();
+                    },
+                });
                 return m;
             }
         });
         
         window.tc[elt+'Collection'] = new cm();
-        window.tc[elt+'Collection'].fetch();
+//         window.tc[elt+'Collection'].fetch();
     });
 })();

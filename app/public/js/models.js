@@ -16,7 +16,7 @@ window.tc = window.tc || {};
             idAttribute: '_id',
             initialize: function() {
                 this.population = {};
-                this.on('add', this.populate, this);
+//                 this.on('add', this.populate, this);
                 this.on('change', function(){
                     if(this._populator)
                         this._populator.trigger('change');
@@ -41,7 +41,7 @@ window.tc = window.tc || {};
                         
                         
                         var self = this;
-//                         console.log('populate '+elt+ ' with ' + _mn +'('+item_ids+')');
+                        console.log('populate '+elt+ ' '+self.id+'\n>> ' + _mn +'('+item_ids+')');
                         if(!Array.isArray(item_ids))
                         {
                             this.population[k] = _c.get_item(item_ids).populator(this);
@@ -85,9 +85,19 @@ window.tc = window.tc || {};
                         }
                         catch(e)
                         {
-                            console.log(k + ' NOT IN ' + elt + this.id);
+                            //console.log(k + ' NOT IN ' + elt + this.id);
                         }
                     }
+                }
+                return ret;
+            },
+            get:function(attr, population){
+                ret = Backbone.Model.prototype.get.apply(this, [attr]);
+                if(population 
+                    && (this.collects !== undefined) 
+                    && (this.population[attr] !== undefined))
+                {
+                    ret = this.population[attr];
                 }
                 return ret;
             },

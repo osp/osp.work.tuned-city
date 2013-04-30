@@ -9,14 +9,29 @@ window.template = {} || window.template;
 window.template = _.extend(window.template,{
     base_url: '/js/templates/',
     cache: {},
+    waiting: {},
+    loading:{},
     render: function(name, el, cb){
         var that = this;
         if(this.cache[name] === undefined)
         {
-            $.get(that.base_url+name+'.html', function(html){
-                that.cache[name] = _.template(html);
-                cb.apply(el, [that.cache[name]]);
-            });
+            if(this.waiting[name] === undefined)
+            {
+                this.waiting[name] = [];
+            }
+            this.waiting[name].push({element:el, callback:cb});
+            if(this.loading[name] === undefined)
+            {
+                this.loading[name] = true;
+                $.get(that.base_url+name+'.html', function(html){
+                    that.cache[name] = _.template(html);
+                    for(var k = 0; k < that.waiting[name].length; k++)
+                    {
+                        var w = that.waiting[name][k];
+                        w.callback.apply(w.element, [that.cache[name]]);
+                    }
+                });
+            }
         }
         else
         {
