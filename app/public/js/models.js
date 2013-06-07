@@ -9,6 +9,8 @@ window.tc = window.tc || {};
 
 
 (function(undefined){
+    'strict';
+    
     var models = 'Bookmark Cursor Connection Path Media Shelf'.split(' ');
     _.each(models, function(elt, idx){
         window.tc[elt] = Backbone.Model.extend({
@@ -16,10 +18,17 @@ window.tc = window.tc || {};
             idAttribute: '_id',
             initialize: function() {
                 this.population = {};
-//                 this.on('add', this.populate, this);
                 this.on('change', function(){
                     if(this._populator)
                         this._populator.trigger('change');
+                    
+                    var cks = _.keys(this.collects || {});
+                    var chks = _.keys(this.changedAttributes() || {});
+                    var its = _.intersection(cks, chks);
+                    if(its.length > 0)
+                    {
+                        this.populate();
+                    }
                 }, this);
                 this.populate();
             },
@@ -29,8 +38,9 @@ window.tc = window.tc || {};
             },
             populate:function()
             {
-                if(this.id && (this.collects !== undefined))
+                if(this.id && (this.collects !== undefined) && (!this._populating))
                 {
+                    this._populating = true;
                     for(var k in this.collects)
                     {
                         var _mn = this.collects[k];
@@ -70,12 +80,13 @@ window.tc = window.tc || {};
                             }
                         }
                     }
+                    this._populating = false;
                 }
                 return this;
             },
             toJSON:function(options){
                 var ret = Backbone.Model.prototype.toJSON.apply(this,[options]);
-                if(options.populate && (this.collects !== undefined))
+                if(options && options.populate && (this.collects !== undefined))
                 {
                     for(var k in this.collects)
                     {
@@ -100,7 +111,7 @@ window.tc = window.tc || {};
                 }
                 return ret;
             },
-            getPopulationReference:function(attr, cb){
+            _getPopulationReference:function(attr, cb){
                 console.log(elt+'.getPopulationReference #'+attr);
                 if(this.population === undefined
                     || this.population[attr] === undefined)
@@ -117,15 +128,21 @@ window.tc = window.tc || {};
                 }
             },
             get:function(attr, population, cb){
-                ret = Backbone.Model.prototype.get.apply(this, [attr]);
+                var ret = Backbone.Model.prototype.get.apply(this, [attr]);
                 if(population 
+                    && (this.attributes[attr] !== undefined)
                     && (this.collects !== undefined) 
                     && (this.collects[attr] !== undefined))
                 {
+                    
                     ret = this.population[attr];
                     if(cb)
                     {
-                        this.getPopulationReference(attr, cb);
+                        this._getPopulationReference(attr, cb);
+                    }
+                    if(ret === undefined)
+                    {
+                        this.populate();
                     }
                 }
                 return ret;

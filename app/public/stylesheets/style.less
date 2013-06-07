@@ -78,42 +78,40 @@ textarea {
         margin-bottom: 18px;
     }
     .Shelf{
+        
         text-align: left;
-        .Bookmark {
-
-            &:hover {
-                z-index: 3;  
-                outline: 3px solid blue;
-            }
-        }
-        .shelf-menu-item{
-            cursor:pointer;
-            &:hover{
-                color: black;
-            }
-            &.selected{
-                background-color: @color4;
-                color:white;
-            }
-        }
         .shelf-items {
             margin-left: @line-height;
-
             img {
                 max-width: 150px;
+            }
+            .BookmarkDelete{
+                float:right;
+                font-size:14pt;
+                font-weight:bold;
+                cursor:pointer;
+                &:hover{
+                    color:red;
+                }
+            }
+            .Bookmark {
+                cursor:pointer;
+                
+                .bookmark-title {
+                    background-color: white;
+                }
+                
+                &:hover .bookmark-title{
+                    background-color: black;
+                    color:white;
+                    font-weight:bold;
+    /*                 outline: 1px solid blue; */
+                }
             }
         }
 
         .count {
             color: white;
-        }
-
-        .bookmark-title {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            z-index: 2;
-            background-color: white;
         }
     }
     .shelf-create-box{

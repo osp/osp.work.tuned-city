@@ -26,11 +26,8 @@
         window.tc[elementView] = Backbone.View.extend({
             className:elt,
             initialize: function() {
+                this.model.on('change', function(){console.log('CHANGE',elt, this.cid, this.model.changedAttributes());}, this);
                 this.model.on('change', this.render, this);
-//                 if(!this.model.isNew())
-//                 {
-//                     this.render();
-//                 }
             },
             render: function() {
                 var $el = this.$el;
@@ -146,13 +143,13 @@
         
         var c = new tc.Cursor({ media:media, cursor:time });
         c.on('sync', function(){
-            var bm = new tc.Bookmark({ note:comment, cursor:c._id });
+            var bm = new tc.Bookmark({ note:comment, cursor:c.id });
             bm.on('sync', function(){
                 var s = tc.ShelfCollection.get(shelf);
-                var bms = s.get('bookmarks');
+                var bms = _.clone(s.get('bookmarks'));
                 bms.push(bm.id);
                 s.set({bookmarks:bms});
-                s.save();
+                s.save({},{wait:true});
             });
             bm.save({},{wait:true});
         });
@@ -161,25 +158,31 @@
     
     _.extend(tc.Media.prototype,{
         _synced:function(res){
-            console.log(res);
-            createBookmark(res._id, 0, 'Origin('+f_name+')', that.shelf);
+            createBookmark(res._id, 
+                           0, 
+                           'Origin('+(this.fileName||res.url.split('/').pop())+')', 
+                           this.get('shelf'));
+            
             this.unset('media',{silent:true});
+            this.unset('shelf',{silent:true});
+            
             this.parse(res);
             this.trigger('sync', this, res, {});
+            
         },
         _sync_error:function(jqXHR, textStatus, errorThrown){
             this.trigger('error', jqXHR, textStatus, errorThrown);
         },
         sync:function(method, model, options){
             
-            if(model.get('media')) // want to upload
+            if(model.get('media') && model.get('shelf')) // want to upload
             {
                 var formdata = new FormData();
                 var f = this.get('media');
-                var f_name = f.name;
+                this.fileName = f.name;
                 formdata.append('media', f);
                 $.ajax({  
-                    url: this.url,  
+                    url: this.url(),  
                     type: "POST",  
                     data: formdata,  
                     processData: false,  
@@ -200,27 +203,27 @@
     tc.FormUploadMedia = _BaseForm.extend({
         id:'upload-media',
         formName:'UploadMedia',
-        formData:{},
-        initialize:function(){
+        formData:function(){
             var shelf = window.app.getView('shelf').collected;
             var medias = shelf.findWhere({title:'medias'});
             if(medias === undefined)
             {
                 var that = this;
-                shelf.create({title:'medias'},
-                            function(sdata){
-                                that.shelf = sdata._id;
-                            });
+                shelf.create({title:'medias'});
             }
-            else
-            {
-                this.shelf = medias.id;
-            }
+            return {shelves:shelf.toJSON()};
+        },
+        initialize:function(){
+            
         },
         submit:function(){
             var $media = this.$el.find('[name=media]');
+            var $shelf = this.$el.find('[name=shelf]');
+            
             var f = $media[0].files[0];
-            var media = tc.MediaCollection.create({media:f},{wait: true});
+            var s = $shelf.val();
+            
+            var media = tc.MediaCollection.create({media:f, shelf:s},{wait: true});
             this.close();
         },
     });
@@ -246,8 +249,8 @@
          */
         makePath:function(cb){
             var self = this;
-            this.getPopulationReference('cursor', function(c){
-                c.getPopulationReference('media', function(m){
+            this.get('cursor', true, function(c){
+                c.get('media', true, function(m){
                     var pe = [tc.PathElement(m.get('url'), m.get('type'), undefined, undefined, m.id)];
                     cb.apply(self, [pe]);
                 });
@@ -325,17 +328,23 @@
         events:{
             'click .shelf-title-box':'toggle',
              'click .BookmarkPlay':'play_bookmark',
+             'click .BookmarkDelete':'delete_bookmark',
         },
         toggle: function(evt){
             this.$el.toggleClass('uncollapsed');
         },
         play_bookmark:function(evt){
-            console.log(arguments);
             var id = evt.currentTarget.id.split('_').pop();
             var bm = tc.BookmarkCollection.get(id);
             bm.makePath(function(p){
                 app.setPath(p);
             });
+        },
+        delete_bookmark:function(evt){
+            var id = evt.currentTarget.id.split('_').pop();
+            var bms = this.model.get('bookmarks');
+            var newbms = _.without(bms, id);
+            this.model.set({bookmarks:newbms}).save({},{wait:true});
         },
         postRender:function(data){
             var $el = this.$el;
