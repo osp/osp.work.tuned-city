@@ -46,6 +46,10 @@ window.tc = window.tc || {};
                         {
                             this.population[k] = _c.get_item(item_ids).populator(this);
                             self.trigger('change');
+                            if(this.population[k].collects === undefined)
+                            {
+                                self.trigger('populated');
+                            }
                         }
                         else
                         {
@@ -58,28 +62,33 @@ window.tc = window.tc || {};
                                     this.population[k].push(_c.get_item(id).populator(this));
                                     self.trigger('change');
                                 }
+                                
+                            }
+                            if((item_ids.length === 0) || (this.population[k][0].collects === undefined))
+                            {
+                                self.trigger('populated');
                             }
                         }
                     }
                 }
                 return this;
             },
-            toJSON:function(populate){
-                var ret = Backbone.Model.prototype.toJSON.apply(this);
-                if(populate && (this.collects !== undefined))
+            toJSON:function(options){
+                var ret = Backbone.Model.prototype.toJSON.apply(this,[options]);
+                if(options.populate && (this.collects !== undefined))
                 {
                     for(var k in this.collects)
                     {
                         try
                         {
                             if(!Array.isArray(ret[k]))
-                                ret[k] = this.population[k].toJSON(true);
+                                ret[k] = this.population[k].toJSON(options);
                             else
                             {
                                 ret[k] = [];
                                 for(var i = 0; i < this.population[k].length; i++)
                                 {
-                                    ret[k].push(this.population[k][i].toJSON(true));
+                                    ret[k].push(this.population[k][i].toJSON(options));
                                 }
                             }
                         }

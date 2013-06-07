@@ -8,34 +8,29 @@ window.tc = window.tc || {};
 tc.Form = function()
 {
     function createBookmark(media, time, comment, shelf){
-        $.post('/api/Cursor', { media:media, cursor:time },
-               function(cdata){
-                   $.post('/api/Bookmark', { note:comment, cursor:cdata._id },
-                          function(bdata){
-                              $.getJSON('/api/Shelf/'+shelf, function(sdata){
-                                  var rdata = _.omit(sdata,'_id','__v');
-                                  rdata.bookmarks.push(bdata._id);
-                                  $.ajax('/api/Shelf/'+sdata._id,{
-                                      type:'PUT',
-                                      dataType: 'json',
-                                      contentType: 'application/json',
-                                      data: JSON.stringify(rdata),
-                                         success: function(data){
-                                             tc.app.shelves.get(shelf).add(bdata._id);
-                                         }
-                                  });
-                              });
-                          });
-    });
+        
+        var c = new tc.Cursor({ media:media, cursor:time });
+        c.on('sync', function(){
+            var bm = new tc.Bookmark({ note:comment, cursor:c._id });
+            bm.on('sync', function(){
+                var s = tc.ShelfCollection.get(shelf);
+                var bms = s.get('bookmarks');
+                bms.push(bm.id);
+                s.set({bookmarks:bms});
+                s.save();
+            });
+            bm.save({},{wait:true});
+        });
+        c.save({},{wait:true});
     };
     
     var upload = {
         init:function(form, data){
-            var medias = tc.app.shelves.get('medias');
+            var medias = window.app.shelves.collected.get('medias');
             if(medias === undefined)
             {
                 var that = this;
-                tc.app.shelves.create({title:'medias'},
+                window.app.shelves.collected.create({title:'medias'},
                     function(sdata){
                         that.shelf = sdata._id;
                     });
@@ -89,18 +84,18 @@ tc.Form = function()
             var time = form.find('.form-time');
             var shelf = form.find('.form-shelf');
             
-            var current_shelf = tc.app.shelves.current();
-            
-            if(current_shelf === undefined)
-            {
-                alert('You got to select a shelf first.');
-                return false;
-            }
-            
-            p.html('Insert a bookmark in <strong>'+current_shelf.data.title+'</strong>');
+//             var current_shelf = window.app.shelves.current();
+//             
+//             if(current_shelf === undefined)
+//             {
+//                 alert('You got to select a shelf first.');
+//                 return false;
+//             }
+//             
+            p.html('Insert a bookmark');
             media.val(data.media);
             time.val(data.time);
-            shelf.val(current_shelf.id);
+//             shelf.val(current_shelf.id);
             return true;
         },
         submit:function(form){
@@ -128,7 +123,14 @@ tc.Form = function()
                 class: 'form-time',
             },
             {
-                type: 'hidden',
+                type: 'select',
+                options:(function(){
+                    var ret = {};
+                    tc.ShelfCollection.each(function( item ) {
+                        ret[item.id] = item.get('title');
+                    });
+                    return ret;
+                })(),
                 class: 'form-shelf',
             },
             {

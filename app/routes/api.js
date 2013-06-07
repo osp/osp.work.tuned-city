@@ -110,13 +110,30 @@ exports.put = function(req, res){
         _generic:function(type, req, res){
             var entity = req.body;
             models[type].update({_id: req.params.id},
-                                entity, 
+                                _.omit(entity, '_id') , 
                                 { upsert: true }, 
                                 function(err, numberAffected, raw){
-                                    if(err) { res.send('500', _.extend(err,{entity:entity})); }
+                                    if(err) { 
+                                        res.send('500', _.extend(err,{
+                                            entity:entity,
+                                            params:{
+                                                type:req.params.type,
+                                                id:req.params.id,
+                                            },
+                                        }));
+                                    }
                                     else
                                     {
-                                        res.send(raw);
+                                        models[type].find({_id:req.params.id}, function(err, m){
+                                            if(err) { res.send('500', err); }
+                                            else
+                                            {
+                                                if(m.length > 0)
+                                                    res.send(m[0]);
+                                                else
+                                                    res.send('404', 'Could not find *it* on this server');
+                                            }
+                                        });
                                     }
                                 });
         },
@@ -130,4 +147,15 @@ exports.put = function(req, res){
     {
         patchers._generic(type, req, res);
     }
+};
+
+exports.destroy = function(req, res){
+    var type = req.params.type;
+    var id = req.params.id;
+    models[type].remove({_id:id},
+        function(err){
+            console.log(err);
+        }
+    );
+    res.status(204).send();
 };

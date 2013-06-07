@@ -5,11 +5,12 @@
  * timecode.js (prototypes extracted from https://github.com/oscarotero/jQuery.media)
  */
 
-window.tc = window.tc || {};
-
-
-tc.MediaPlayer = function(elt)
-{
+(function(undefined){
+    'strict';
+    
+    var tc = window.tc;
+    var Backbone = window.Backbone;
+    
     /**
      * function relativeOffset (e [, currentTarget])
      *
@@ -29,7 +30,15 @@ tc.MediaPlayer = function(elt)
         };
     };
     
-    var proto = {
+    var player = Backbone.View.extend({
+        id:'mediaplayer',
+        className:'outer',
+        initialize:function(){
+            this.currentPath = 
+        },
+        render:function(){
+            
+        },
         getSpectrogramWidth: function () {
             return this.ui.innerContainer.width();
         },
@@ -197,9 +206,7 @@ tc.MediaPlayer = function(elt)
             this.ui.innerContainer.on("click", this.innerContainerClicked.bind(this));
             this.ui.commentCursor.on("click", this.commentCursorClicked.bind(this));
         }
-    };
+    });
     
-    var ret = Object.create(proto);
-    ret.init(elt);
-    return ret;
+    tc.MediaPlayer = player;
 }

@@ -1,9 +1,9 @@
 
     <div class="shelf-title-box">
-        <div class="shelf-title"><%- title %> <span class="count"><%= bookmarks.length %></span></div>
+    <div class="shelf-title"><%- data.title %> <span class="count"><%= data.bookmarks.length %></span></div>
     </div>
     <div class="shelf-items">
-    <% for(var i=0; i < bookmarks.length; i++){ var b = bookmarks[i];%>
+    <% for(var i=0; i < data.bookmarks.length; i++){ var b = data.bookmarks[i];%>
         <div class="Bookmark" id="Bookmark_<%= b._id %>">
             <div class="BookmarkPlay" id="BookmarkPlay_<%= b._id %>">
                 <span class="bookmark-title"><%- b.note %></span>

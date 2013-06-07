@@ -15,6 +15,9 @@ var api = {
     // PATCH
     put:{url:'/api/:type/:id', req:'./api', verb:'put'},
     
+    // DELETE
+    destroy:{url:'/api/:type/:id', req:'./api', verb:'delete'},
+    
 };
 
 var web = {

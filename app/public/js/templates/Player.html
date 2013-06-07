@@ -1,0 +1,20 @@
+<!-- media player -->
+<% if(data.url !== ''){ %>
+<h2>Currently watching: <br /> <%- node.url %></h2>
+<% } %>
+<div>
+<button class="previous"><%= data.previous %></button>
+    <video id="mediaelement-player" src="<%= data.url %>" width="320" height="240"></video>
+    <button class="next"><%= data.next %></button>
+</div>
+<div class="spectrogram">
+    <div class="progress"></div>
+    <div class="cursor"></div>
+    <div class="target" style="left: 1px;"></div>
+    <img class="spectrogram-image" />
+    <div class="comment">
+        <div class="comment-cursor" style="left: 1px;"></div>
+    </div>
+</div>
+<br />
+<button class="upload">Add Media</button>
