@@ -123,14 +123,14 @@
             console.log(pid);
             that.current_path = tc.Path(pid, {
                 onDataComplete:function(e){
-                    that.player.loadPath(that.current_path);
+                    that.getView('player').loadPath(that.current_path);
                 }
             });
         },
         _setPathElements:function(elts){
             this.current_path = new tc.Path({_id:'Bookmark_P'});
             this.current_path.elements = elts;
-            this.player.loadPath(this.current_path);
+            this.getView('player').loadPath(this.current_path);
         },
  
     });

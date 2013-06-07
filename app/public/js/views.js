@@ -362,7 +362,6 @@
                 $(this).dynamicImg({
                     callback: function() {
                         var offset = i * 10;
-                        console.log(offset);
                         var bookmarks = $el.find('.Bookmark');
                         var len = bookmarks.length
                         

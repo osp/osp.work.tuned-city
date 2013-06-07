@@ -47,7 +47,10 @@ window.tc = window.tc || {};
                         var _c = window.tc[_mn + 'Collection'];
                         var item_ids = this.get(k);
                         if(item_ids === undefined)
+                        {
+                            this._populating = false;
                             return;
+                        }
                         
                         
                         var self = this;
@@ -118,7 +121,7 @@ window.tc = window.tc || {};
                 {
                     var self = this;
                     window.setTimeout(function(){
-                        self.getPopulationReference(attr, cb);
+                        self._getPopulationReference(attr, cb);
                     }, 300);
                 }
                 else
