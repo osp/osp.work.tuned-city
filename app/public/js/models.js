@@ -171,15 +171,12 @@ window.tc = window.tc || {};
             this.get('cursor', true, function(c){
                 c.get('media', true, function(m){
                     var pe = [new tc.PathElement({
-                        media:{
-                            id:m.id, 
-                            url:m.get('url'), 
+                        media:m.toJSON(),
+                        annotation:{
+                            prev:undefined, 
+                            next:undefined
                         },
-                        type:m.get('type'), 
-                                                annotation:{
-                                                    prev:undefined, 
-                                                next:undefined
-                                                }
+                        cursor: (c.get('cursor') || 0),
                     })];
                     
                     cb.apply(self, [pe]);

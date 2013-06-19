@@ -6,10 +6,11 @@ $(document).ready(function(){
     'strict';
     
     window.app = new tc.App;
-    window.router = new tc.Router;
-    app.start();
     
-    window.Backbone.history.start({pushState: false});
+    app.on('ready', function(){
+        window.router = new tc.Router;
+        window.Backbone.history.start({pushState: false});
+    });
     
     $('body').on('click', '.route', function(evt){
         var that = $(this);
@@ -17,4 +18,5 @@ $(document).ready(function(){
         window.router.navigate(that.attr('data-route'));
     });
     
+    app.start();
 });

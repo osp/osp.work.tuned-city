@@ -29,13 +29,17 @@
                 this.model.on('change', function(){console.log('CHANGE',elt, this.cid, this.model.changedAttributes());}, this);
                 this.model.on('change', this.render, this);
             },
-            render: function() {
+            render: function(callback) {
                 var $el = this.$el;
                 $el.attr('id', elt+ '_' +this.model.id)
                 var data = this.model.toJSON({populate:true});
                 
                 template.render(elt, this, function(t){
                     $el.html(t(data));
+                    if(callback && ((typeof callback) === 'function'))
+                    {
+                        callback.apply(this, []);
+                    }
                     if(this.postRender)
                     {
                         this.postRender(data);
@@ -336,19 +340,23 @@
         initialize:function(){
             
         },
-        render:function(){
+        render:function(callback){
             var $el = this.$el;
             $el.empty();
             
             var node = this.model.current();
             var data = {
-                url:'',
+                url:undefined,
                 next:'Next',
                 previous:'Previous',
+                type: undefined,
             };
+            
             if(node){
                 var media = node.get('media');
                 data.url = media.url;
+                data.type = media.type;
+                
                 if (node.get('annotation').next) {
                     data.next = node.get('annotation').next;
                 }
@@ -360,38 +368,51 @@
             template.render('Player', this, function(t){
                 $el.html(t(data));
                 this.setupPlayer(node);
+                if(callback && ((typeof callback) === 'function'))
+                {
+                    callback.apply(this, []);
+                }
             });
             
             return this;
         },
+        
         getSpectrogramWidth: function () {
             return this.$el.find('.spectrogram').width();
         },
+        
+        _timeUpdate: function (mediaElement, domObject) {
+            // add event listener
+            var ctx = this;
+            mediaElement.addEventListener('timeupdate', function(event) {
+                var currentPercentAbsolute = (100 / this.duration) * this.currentTime;
+                
+                ctx.$progress.css('width', currentPercentAbsolute + '%');
+                ctx.$cursor.css('left', currentPercentAbsolute + '%');
+            
+                ctx.$time.text(this.currentTime.secondsTo('mm:ss') + ' / ' + this.duration.secondsTo('mm:ss'));
+            }, false);
+        },
+        
         setupPlayer: function(node){
             var that = this;
             var $el = this.$el;
             var $player = $('#mediaelement-player');
-            var $progress = $el.find('.progress');
-            var $cursor = $el.find('.cursor');
-            var $time = $el.find('.time'); 
             
-            this._player = new MediaElementPlayer($player, {
-                features: ['playpause','current','progress','duration','volume'],
-                success: function (mediaElement, domObject) {
-                    // add event listener
-                    mediaElement.addEventListener('timeupdate', function(event) {
-                        var currentPercentAbsolute = (100 / this.duration) * this.currentTime;
-                        
-                        $progress.css('width', currentPercentAbsolute + '%');
-                        $cursor.css('left', currentPercentAbsolute + '%');
-                        
-                        $time.text(this.currentTime.secondsTo('mm:ss') + ' / ' + this.duration.secondsTo('mm:ss'));
-                    }, false);
-                }
-            });
+            var ctx = {
+                $progress: $el.find('.progress'),
+                $cursor : $el.find('.cursor'),
+                $time : $el.find('.time'),
+            };
             
             if(node)
             {
+                this._player = new MediaElementPlayer($player, {
+                    features: ['playpause','current','progress','duration','volume'],
+                    success: this._timeUpdate.bind(ctx),
+                });
+                
+                
                 $.getJSON('/spectrogram/' + node.get('media').id + '/', function(data) {
                     that.$el.find('.spectrogram-image').attr('src', data.url);
                 });
@@ -406,20 +427,37 @@
             var node = this.model.current();
             this.setNode(node);
         },
-        setNode:function(node){
-            this.render();
+        setNode:function(cb){
+            this.render(cb);
+        },
+        setCurrentTime:function(time){
+            var self = this;
+            if(this._player.isLoaded){ // FIXME
+                this._player.media.addEventListener('canplay', function(evt){
+                    self._player.play();
+                    self._player.setCurrentTime(time);
+                });
+                self._player.load();
+            }
+            else{
+                self._player.play();
+                self._player.setCurrentTime(time);
+            }
         },
         playCurrent:function(){
             var node = this.model.current();
+            var self = this;
             if (node) {
-                this.setNode(node);
-                this._player.media.play();
+                this.setNode(function(){
+                    self.setCurrentTime(node.get('cursor'));
+                });
             }
         },
         playNext:function(){
             var node = this.model.next();
             if (node) {
                 this.setNode(node);
+                this._player.media.setCurrentTime(node.get('cursor'));
                 this._player.media.play();
             }
         },
@@ -427,6 +465,7 @@
             var node = this.model.previous();
             if (node) {
                 this.setNode(node);
+                this._player.media.setCurrentTime(node.get('cursor'));
                 this._player.media.play();
             }
         },
