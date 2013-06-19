@@ -342,7 +342,7 @@
         },
         render:function(callback){
             var $el = this.$el;
-            $el.empty();
+            this._playerReady = false;
             
             var node = this.model.current();
             var data = {
@@ -395,7 +395,7 @@
         },
         
         setupPlayer: function(node){
-            var that = this;
+            var self = this;
             var $el = this.$el;
             var $player = $('#mediaelement-player');
             
@@ -405,13 +405,44 @@
                 $time : $el.find('.time'),
             };
             
-            if(node)
+            if( node 
+                && node.has('media') 
+                && node.get('media').url 
+                && node.get('media').type )
             {
-                this._player = new MediaElementPlayer($player, {
-                    features: ['playpause','current','progress','duration','volume'],
-                    success: this._timeUpdate.bind(ctx),
+                var mime = node.get('media').type.split('/');
+                var subtype = mime.pop();
+                var media = { };
+                media[subtype] =  node.get('media').url;
+                
+                var player = this.$el.find("#player");
+                player.jPlayer({
+                    ready: function(){ 
+                        $(this).jPlayer("setMedia", media); 
+                        self._playerReady = true;
+                        self.trigger('player:ready');
+                    },
+                    swfPath: "/javascript/Jplayer.swf",
+                    supplied: subtype,
+                    cssSelectorAncestor: "#mediaplayer .controls",
+                    cssSelector: {
+                        play: ".play",
+                        pause: ".pause",
+                        mute: ".mute",
+                        unmute: ".unmute",
+                        currentTime: ".currentTime",
+                        duration: ".duration"
+                    },
+                    size: {
+                        width: "320px",
+                        height: "180px"
+                    }
                 });
                 
+                this._playerData = this.$el.find("#player").data('jPlayer');
+                this._player = function(){
+                    player.jPlayer.apply(player, arguments);
+                };
                 
                 $.getJSON('/spectrogram/' + node.get('media').id + '/', function(data) {
                     that.$el.find('.spectrogram-image').attr('src', data.url);
@@ -431,26 +462,19 @@
             this.render(cb);
         },
         setCurrentTime:function(time){
-            var self = this;
-            if(this._player.isLoaded){ // FIXME
-                this._player.media.addEventListener('canplay', function(evt){
-                    self._player.play();
-                    self._player.setCurrentTime(time);
-                });
-                self._player.load();
-            }
-            else{
-                self._player.play();
-                self._player.setCurrentTime(time);
-            }
+            var duration = this._playerData.status.duration;
+            if(duration > 0)
+                this._player('playHead', time * 100.0 / this._playerData.status.duration);
         },
         playCurrent:function(){
             var node = this.model.current();
-            var self = this;
-            if (node) {
-                this.setNode(function(){
-                    self.setCurrentTime(node.get('cursor'));
-                });
+            if(node) {
+                this.once('player:ready', function(){
+//                     this.setCurrentTime();
+                    this._player('play', node.get('cursor'));
+                }, this);
+                
+                this.setNode();
             }
         },
         playNext:function(){
@@ -458,7 +482,7 @@
             if (node) {
                 this.setNode(node);
                 this._player.media.setCurrentTime(node.get('cursor'));
-                this._player.media.play();
+                this._player('play');
             }
         },
         playPrevious:function(){

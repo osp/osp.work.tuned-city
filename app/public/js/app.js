@@ -106,7 +106,7 @@
             this.registerComponent('shelf', new tc.ShelfCollectionView);
             this.registerComponent('paths', new tc.PathCollectionView);
             this.registerComponent('player', new tc.PathView({model:new tc.Path}));
-            this.registerComponent('connections', new tc.ConnectionWidget);
+//             this.registerComponent('connections', new tc.ConnectionWidget);
         },
         
         start: function(){

@@ -1,25 +1,32 @@
 <!-- media player -->
-<% if(data.url){ %>
-    <h2>Currently watching: <br /> <%- data.url %></h2>
-    <div>
+
+<h2>Currently watching: </h2>
+<div> <%- data.url %> </div>
+
+<div class="nav">
     <button class="previous"><%= data.previous %></button>
-    <% var type = data.type.split('/'); %>
-    <% if(type && type[0] === 'video'){ %>
-        <video id="mediaelement-player" src="<%= data.url %>" width="320" height="240"></video>
-    <% }else{ %>
-        <audio  id="mediaelement-player" src="<%= data.url %>"></audio>
-    <% } %>
-        <button class="next"><%= data.next %></button>
+    <button class="next"><%= data.next %></button>
+</div>
+
+<div id="player"></div>
+<div class="controls">
+<span class="play">play</span>
+<span class="pause">pause</span>
+<span class="mute">mute</span>
+<span clas="unmute">unmute</span>
+<span class="currentTime"></span>
+<span class="duration"></span>
+</div>
+
+
+<div class="spectrogram">
+    <div class="progress"></div>
+    <div class="cursor"></div>
+    <div class="target" style="left: 1px;"></div>
+    <img class="spectrogram-image" />
+    <div class="comment">
+        <div class="comment-cursor" style="left: 1px;"></div>
     </div>
-    <div class="spectrogram">
-        <div class="progress"></div>
-        <div class="cursor"></div>
-        <div class="target" style="left: 1px;"></div>
-        <img class="spectrogram-image" />
-        <div class="comment">
-            <div class="comment-cursor" style="left: 1px;"></div>
-        </div>
-    </div>
-<% } %>
+</div>
 
 <button class="upload">Add Media</button>
