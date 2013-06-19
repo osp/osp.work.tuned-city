@@ -228,6 +228,27 @@
         },
     });
     
+    tc.FormCreateBookmark = _BaseForm.extend({
+        formName:'CreateBookmark',
+        formData:function(){
+            var shelf = window.app.getView('shelf').collected;
+            return _.extend({shelves:shelf.toJSON()}, this.options);
+        },
+        initialize:function(){
+            
+        },
+        submit:function(){
+            var $note = this.$el.find('[name=note]');
+            var $shelf = this.$el.find('[name=shelf]');
+            var s = $shelf.val();
+            var n = $note.val();
+            
+            createBookmark(this.options.media, this.options.ctime, n, s);
+            
+            this.close();
+            },
+        });
+    
     
     _.extend(window.tc.ShelfCollectionView.prototype,{
         events:{
@@ -432,13 +453,18 @@
             var pc = relativeOffset(e, this.$el.find('.spectrogram')).left / (this.getSpectrogramWidth() / 100);
             var clickedTime = this._player.media.duration / 100 * pc;
             
-            this._player.media.pause()
-            app.form.open('bookmark', {
-                time:clickedTime,
-                media:this.model.current().get('media').id,
+            this._player.media.pause();
+//             app.form.open('bookmark', {
+//                 time:clickedTime,
+//                 media:this.model.current().get('media').id,
+//             });
+            
+            var form = new tc.FormCreateBookmark({
+                media: this.model.current().get('media').id,
+                ctime: clickedTime,
             });
             
-//             var $cc = this.$el.find('.comment-cursor');
+            this.$el.append(form.render().el);
             
             $cc
             .clone()
