@@ -326,12 +326,13 @@
                 previous:'Previous',
             };
             if(node){
-                data.url = node.url;
-                if (node.annotation.next) {
-                    data.next = node.annotation.next;
+                var media = node.get('media');
+                data.url = media.url;
+                if (node.get('annotation').next) {
+                    data.next = node.get('annotation').next;
                 }
-                if (node.annotation.prev) {
-                    data.previous = node.annotation.prev;
+                if (node.get('annotation').prev) {
+                    data.previous = node.get('annotation').prev;
                 }
             }
             
