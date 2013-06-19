@@ -228,89 +228,6 @@
         },
     });
     
-    window.tc.PathElement = function(url, media_type, note_prev, note_next, media_id){
-        var proto = {
-            init:function(url, media_type, note_prev, note_next, media_id){
-                this.url = url;
-                this.media_id = media_id;
-                this.media_type = media_type;
-                this.annotation = {prev:note_prev, next:note_next};
-                return this;
-            },
-        };
-        
-        return Object.create(proto).init(url, media_type, note_prev, note_next, media_id);
-    };
-    
-    
-    _.extend(window.tc.Bookmark.prototype, {
-        /*
-         *  Forge a path suitable for loading into media player
-         */
-        makePath:function(cb){
-            var self = this;
-            this.get('cursor', true, function(c){
-                c.get('media', true, function(m){
-                    var pe = [tc.PathElement(m.get('url'), m.get('type'), undefined, undefined, m.id)];
-                    cb.apply(self, [pe]);
-                });
-            });
-        },
-    });
-    
-    
-    _.extend(window.tc.Path.prototype,{
-        collects : { trackpoints: 'Connection' },
-        current_element: 0,
-        elements: [],
-        fill_elements:function(){
-            var trackpoints = this.population.trackpoints;
-            for(var i =0; i< trackpoints.length; i++)
-            {
-                var con = trackpoints[i];
-                var media = con.population.end.population.media.url;
-                var type = con.population.end.population.media.type;
-                var a_prev = con.annotation;
-                var a_next = null;
-                if(i < (trackpoints.length - 1))
-                {
-                    a_next = trackpoints[i + 1].annotation;
-                }
-                this.elements.push(tc.PathElement(media, type, a_prev, a_next));
-            }
-        },
-        begin: function(){
-            this.current_element = 0;
-            return this.current();
-        },
-        end: function(){
-            this.current_element = this.elements.length - 1;
-            return this.current();
-        },
-        next: function(){
-            var cur = this.current_element + 1;
-            if(cur > (this.elements.length - 1))
-                return null;
-            this.current_element = cur;
-            return this.current();
-        },
-        previous: function(){
-            var cur = this.current_element - 1;
-            if(cur < 0)
-                return null;
-            this.current_element = cur;
-            return this.current();
-        },
-        current: function(){
-            return this.elements[this.current_element];
-        },
-        count: function(){
-            return this.elements.length;
-        },
-        at: function(idx){
-            return this.elements[idx];
-        },
-    });
     
     _.extend(window.tc.ShelfCollectionView.prototype,{
         events:{
@@ -327,19 +244,19 @@
     _.extend(window.tc.ShelfView.prototype,{
         events:{
             'click .shelf-title-box':'toggle',
-             'click .BookmarkPlay':'play_bookmark',
+//              'click .BookmarkPlay':'play_bookmark',
              'click .BookmarkDelete':'delete_bookmark',
         },
         toggle: function(evt){
             this.$el.toggleClass('uncollapsed');
         },
-        play_bookmark:function(evt){
-            var id = evt.currentTarget.id.split('_').pop();
-            var bm = tc.BookmarkCollection.get(id);
-            bm.makePath(function(p){
-                app.setPath(p);
-            });
-        },
+//         play_bookmark:function(evt){
+//             var id = evt.currentTarget.id.split('_').pop();
+//             var bm = tc.BookmarkCollection.get(id);
+//             bm.makePath(function(p){
+//                 app.setPath(p);
+//             });
+//         },
         delete_bookmark:function(evt){
             var id = evt.currentTarget.id.split('_').pop();
             var bms = this.model.get('bookmarks');
@@ -453,11 +370,11 @@
             
             if(node)
             {
-                $.getJSON('/spectrogram/' + node.media_id + '/', function(data) {
+                $.getJSON('/spectrogram/' + node.get('media').id + '/', function(data) {
                     that.$el.find('.spectrogram-image').attr('src', data.url);
                 });
                     
-                $.getJSON('/poster/' + node.media_id + '/', function(data) {
+                $.getJSON('/poster/' + node.get('media').id + '/', function(data) {
                     that._player.media.poster = data.url
                 });
             }
@@ -517,7 +434,7 @@
             this._player.media.pause()
             app.form.open('bookmark', {
                 time:clickedTime,
-                media:this.model.current().media_id,
+                media:this.model.current().get('media').id,
             });
             
 //             var $cc = this.$el.find('.comment-cursor');

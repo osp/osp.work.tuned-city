@@ -7,10 +7,10 @@
         <div class="BookmarkDelete" id="BookmarkDelete_<%= b._id %>">&times; </div>
         <div class="Bookmark" id="Bookmark_<%= b._id %>">
             
-            <div class="BookmarkPlay" id="BookmarkPlay_<%= b._id %>">
+            <div class="BookmarkPlay route" data-route="bookmark/play/<%= b._id %>">
                 <span class="bookmark-title"><%- b.note %></span>
                 <% if(b.cursor && b.cursor.media){ %>
-                <a rel="embed" href="/poster/<%- b.cursor.media._id %>"><%- b._id %></a>
+<!--                 <a rel="embed" href="/poster/<%- b.cursor.media._id %>"><%- b._id %></a> -->
                 <% } %>
             </div>
         </div>

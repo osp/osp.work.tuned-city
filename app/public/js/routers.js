@@ -21,7 +21,7 @@
             '': 'index',
             'index': 'index',
             'path/:id' :'path',
-            'bookmark/:id' :'bookmark',
+            'bookmark/play/:id' :'bookmarkPlay',
         },
         
         index:function(){
@@ -30,8 +30,17 @@
         path:function(id){
             
         },
-        bookmark:function(id){
-            
+        bookmarkPlay:function(id){
+            window.app.setComponents('shelf paths player'.split(' '));
+            var bm = tc.BookmarkCollection.get(id);
+            if(!bm)
+            {
+                tc.BookmarkCollection.add({_id:id});
+                bm = tc.BookmarkCollection.get(id);
+            }
+            bm.makePath(function(p){
+                window.app.setPath(p);
+            });
         },
     });
     

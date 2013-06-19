@@ -31,6 +31,9 @@ window.tc = window.tc || {};
                     }
                 }, this);
                 this.populate();
+                if(this.postInitialize){
+                    this.postInitialize();
+                }
             },
             populator:function(m){
                 this._populator = m;
@@ -154,6 +157,102 @@ window.tc = window.tc || {};
     });
     
     
+    window.tc.PathElement = Backbone.Model.extend({
+        initialize:function(){
+        },
+    });
+    
+    _.extend(window.tc.Bookmark.prototype, {
+        /*
+         *  Forge a path suitable for loading into media player
+         */
+        makePath:function(cb){
+            var self = this;
+            this.get('cursor', true, function(c){
+                c.get('media', true, function(m){
+                    var pe = [new tc.PathElement({
+                        media:{
+                            id:m.id, 
+                            url:m.get('url'), 
+                        },
+                        type:m.get('type'), 
+                                                annotation:{
+                                                    prev:undefined, 
+                                                next:undefined
+                                                }
+                    })];
+                    
+                    cb.apply(self, [pe]);
+                });
+            });
+        },
+    });
+    
+    _.extend(window.tc.Path.prototype,{
+        postInitialize:function(){
+            this.current_element = 0;
+            this.elements = [];
+        },
+        fill_elements:function(){
+            var trackpoints = this.population.trackpoints;
+            for(var i =0; i< trackpoints.length; i++)
+            {
+                var con = trackpoints[i];
+                var media = con.population.end.population.media.url;
+                var type = con.population.end.population.media.type;
+                var mid = con.population.end.population.media._id;
+                var a_prev = con.annotation;
+                var a_next = null;
+                if(i < (trackpoints.length - 1))
+                {
+                    a_next = trackpoints[i + 1].annotation;
+                }
+                this.elements.push(new tc.PathElement({
+                    media:{
+                        id:mid, 
+                        url:media, 
+                    },
+                    type:type, 
+                    annotation:{
+                        prev:a_prev, 
+                        next:a_next
+                    }
+                }));
+            }
+        },
+        begin: function(){
+            this.current_element = 0;
+            return this.current();
+        },
+        end: function(){
+            this.current_element = this.elements.length - 1;
+            return this.current();
+        },
+        next: function(){
+            var cur = this.current_element + 1;
+            if(cur > (this.elements.length - 1))
+                return null;
+            this.current_element = cur;
+            return this.current();
+        },
+        previous: function(){
+            var cur = this.current_element - 1;
+            if(cur < 0)
+                return null;
+            this.current_element = cur;
+            return this.current();
+        },
+        current: function(){
+            return this.elements[this.current_element];
+        },
+        count: function(){
+            return this.elements.length;
+        },
+        at: function(idx){
+            return this.elements[idx];
+        },
+    });
+    
     _.extend(window.tc.Shelf.prototype, {collects:{bookmarks: 'Bookmark'}});
     
     _.extend(window.tc.Connection.prototype, {collects:{ start: 'Cursor', end: 'Cursor'}});
@@ -163,6 +262,7 @@ window.tc = window.tc || {};
     _.extend(window.tc.Cursor.prototype, {collects:{media: 'Media'}});
     
     _.extend(window.tc.Path.prototype,{ collects : { trackpoints: 'Connection' } });
+    
     
     
     
