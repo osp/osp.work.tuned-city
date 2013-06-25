@@ -84,12 +84,12 @@ input[type="text"] {
 }
 
 textarea {
-    width: 100%;
+/*     width: 100%; */
     outline: 1px solid @color1; 
     border: none;
     padding: none;
     margin: none;
-    min-height: 300px;
+    min-height: 120px;
 }
 
 .ShelfCollection{
@@ -175,13 +175,14 @@ button {
         .widget-title;
     }
     
-    #upload-media{
+    .form{
         .absPos(0,0,0,0);
         background-color:white;
         z-index:10000;
         .content{
             .absPos(34px,0,0,34px);
             .label{
+                margin:12px 0 6px 0;
                 color:#333;
                 text-align:left;
             }
@@ -251,12 +252,18 @@ button {
 .ConnectionWidget{
     .absPos(50%,0,0,50%);
     overflow: auto;
-    background-color: lightgrey;
-    
+    background-color: #ddd;
+    padding:6px;
     .boxtitle{
         .widget-title;
     }
-    
+    .cw_save{
+        .absPos(2px, 2px, auto, auto);
+        z-index:10000;
+    }
+    .head{
+        margin:32px 0 0 0 ;
+    }
     .new_conn{
         td{
             vertical-align: top;
@@ -265,8 +272,8 @@ button {
             margin:3px;
         }
         .in,.out,textarea.annotation{
-            width:300px;
-            height:80px;
+/*             width:30%; */
+            height:60px;
             border:1px solid @color2;
             min-height: 0;
             display: block;

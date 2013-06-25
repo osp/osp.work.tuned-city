@@ -31,7 +31,7 @@
             
         },
         bookmarkPlay:function(id){
-            window.app.setComponents('shelf paths player'.split(' '));
+            window.app.setComponents('shelf paths player connections'.split(' '));
             var bm = tc.BookmarkCollection.get(id);
             if(!bm)
             {

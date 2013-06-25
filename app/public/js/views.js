@@ -429,7 +429,7 @@
                     }
                 });
                 
-                this._playerData = this.$el.find("#player").data('jPlayer');
+                this._playerData = this.$el.find(".player").data('jPlayer');
                 this._player = function(){
                     player.jPlayer.apply(player, arguments);
                 };
@@ -535,8 +535,8 @@
         initialize:function(){
             this.trig = $('<div></div>').addClass('cw_trig');
             this.ctnr = $('<div></div>').addClass('cw_ctnr');
-            this.nr = $('<div>Add Connection</div>').addClass('cw_nr');
-            this.sb = $('<div>Save</div>').addClass('cw_save');
+            this.nr = $('<button>add connection</button>').addClass('cw_nr');
+            this.sb = $('<button>save</button>').addClass('cw_save');
             
             this.nr.on('click', this.add_row.bind(this));
             this.sb.on('click', this.save.bind(this));
