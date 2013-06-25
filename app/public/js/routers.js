@@ -25,7 +25,7 @@
         },
         
         index:function(){
-            window.app.setComponents('shelf paths player'.split(' '));
+            window.app.setComponents('shelf paths player connections'.split(' '));
         },
         path:function(id){
             
