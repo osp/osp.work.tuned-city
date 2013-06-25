@@ -38,9 +38,18 @@
                 tc.BookmarkCollection.add({_id:id});
                 bm = tc.BookmarkCollection.get(id);
             }
-            bm.makePath(function(p){
-                window.app.setPath(p);
+            bm.on('change', function(){
+                bm.makePath(function(p){
+                    window.app.setPath(p);
+                });
             });
+            if(bm.has('cursor'))
+            {
+                bm.makePath(function(p){
+                    window.app.setPath(p);
+                });
+            }
+            bm.fetch();
         },
     });
     

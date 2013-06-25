@@ -56,25 +56,25 @@ exports.post = function(req, res){
                         else
                         {
                             var t = media.type.split('/');
-                            var mtype = t.pop();
-                            var type = t.pop();
-                            if(mtype === 'webm')
+                            var subtype = t.pop();
+                            var _type = t.pop();
+                            if(subtype === 'webm')
                             {
                                 if(type === 'video')
-                                    mtype = 'webmv';
+                                    subtype = 'webmv';
                                 else
-                                    mtype = 'webma';
+                                    subtype = 'webma';
                             }
-                            if(mtype === 'ogg')
+                            if(subtype === 'ogg')
                             {
-                                if(type === 'video')
-                                    mtype = 'ogv';
+                                if(type === 'audio')
+                                    subtype = 'oga';
                                 else
-                                    mtype = 'oga';
+                                    subtype = 'ogv';
                             }
                             var obj = {
                                 url:  media_url + fname,
-                                type: mtype,
+                                 type: _type+'/'+subtype,
                             };
                             var mm = new models.Media(obj);
                             mm.save();

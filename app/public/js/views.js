@@ -29,13 +29,17 @@
                 this.model.on('change', function(){console.log('CHANGE',elt, this.cid, this.model.changedAttributes());}, this);
                 this.model.on('change', this.render, this);
             },
-            render: function() {
+            render: function(callback) {
                 var $el = this.$el;
                 $el.attr('id', elt+ '_' +this.model.id)
                 var data = this.model.toJSON({populate:true});
                 
                 template.render(elt, this, function(t){
                     $el.html(t(data));
+                    if(callback && ((typeof callback) === 'function'))
+                    {
+                        callback.apply(this, []);
+                    }
                     if(this.postRender)
                     {
                         this.postRender(data);
@@ -228,6 +232,27 @@
         },
     });
     
+    tc.FormCreateBookmark = _BaseForm.extend({
+        formName:'CreateBookmark',
+        formData:function(){
+            var shelf = window.app.getView('shelf').collected;
+            return _.extend({shelves:shelf.toJSON()}, this.options);
+        },
+        initialize:function(){
+            
+        },
+        submit:function(){
+            var $note = this.$el.find('[name=note]');
+            var $shelf = this.$el.find('[name=shelf]');
+            var s = $shelf.val();
+            var n = $note.val();
+            
+            createBookmark(this.options.media, this.options.ctime, n, s);
+            
+            this.close();
+            },
+        });
+    
     
     _.extend(window.tc.ShelfCollectionView.prototype,{
         events:{
@@ -315,61 +340,103 @@
         initialize:function(){
             
         },
-        render:function(){
+        render:function(callback){
             var $el = this.$el;
-            $el.empty();
+            this._playerReady = false;
             
             var node = this.model.current();
             var data = {
-                url:'',
+                url:undefined,
                 next:'Next',
                 previous:'Previous',
+                type: undefined,
             };
+            
             if(node){
-                data.url = node.url;
-                if (node.annotation.next) {
-                    data.next = node.annotation.next;
+                var media = node.get('media');
+                data.url = media.url;
+                data.type = media.type;
+                
+                if (node.get('annotation').next) {
+                    data.next = node.get('annotation').next;
                 }
-                if (node.annotation.prev) {
-                    data.previous = node.annotation.prev;
+                if (node.get('annotation').prev) {
+                    data.previous = node.get('annotation').prev;
                 }
             }
             
             template.render('Player', this, function(t){
                 $el.html(t(data));
                 this.setupPlayer(node);
+                if(callback && ((typeof callback) === 'function'))
+                {
+                    callback.apply(this, []);
+                }
             });
             
             return this;
         },
+        
         getSpectrogramWidth: function () {
             return this.$el.find('.spectrogram').width();
         },
+        
+        _timeUpdate: function (event) {
+            var ctx = {
+                $progress: this.$el.find('.progress'),
+                $cursor : this.$el.find('.cursor'),
+            };
+            
+            var currentPercentAbsolute = event.jPlayer.status.currentPercentAbsolute;
+            
+            ctx.$progress.css('width', currentPercentAbsolute + '%');
+            ctx.$cursor.css('left', currentPercentAbsolute + '%');
+           
+        },
+        
         setupPlayer: function(node){
-            var that = this;
-            var $el = this.$el;
-            var $player = $('#mediaelement-player');
-            var $progress = $el.find('.progress');
-            var $cursor = $el.find('.cursor');
-            var $time = $el.find('.time'); 
-            
-            this._player = new MediaElementPlayer($player, {
-                features: ['playpause','current','progress','duration','volume'],
-                success: function (mediaElement, domObject) {
-                    // add event listener
-                    mediaElement.addEventListener('timeupdate', function(event) {
-                        var currentPercentAbsolute = (100 / this.duration) * this.currentTime;
-                        
-                        $progress.css('width', currentPercentAbsolute + '%');
-                        $cursor.css('left', currentPercentAbsolute + '%');
-                        
-                        $time.text(this.currentTime.secondsTo('mm:ss') + ' / ' + this.duration.secondsTo('mm:ss'));
-                    }, false);
-                }
-            });
-            
-            if(node)
+            var self = this;
+            if( node 
+                && node.has('media') 
+                && node.get('media').url 
+                && node.get('media').type )
             {
+                var mime = node.get('media').type.split('/');
+                var subtype = mime.pop();
+                var media = { };
+                media[subtype] =  node.get('media').url;
+                
+                var player = this.$el.find("#player");
+                player.jPlayer({
+                    ready: function(){ 
+                        $(this).jPlayer("setMedia", media); 
+                        self._playerReady = true;
+                        self.trigger('player:ready');
+                    },
+                    swfPath: "/javascript/Jplayer.swf",
+                    supplied: subtype,
+                    cssSelectorAncestor: "#mediaplayer .controls",
+                    cssSelector: {
+                        play: ".play",
+                        pause: ".pause",
+                        mute: ".mute",
+                        unmute: ".unmute",
+                        currentTime: ".currentTime",
+                        duration: ".duration"
+                    },
+                    size: {
+                        width: "320px",
+                        height: "180px"
+                    }
+                });
+                
+                this._playerData = this.$el.find("#player").data('jPlayer');
+                this._player = function(){
+                    player.jPlayer.apply(player, arguments);
+                };
+                
+                player.on($.jPlayer.event.timeupdate, this._timeUpdate.bind(this));
+                
                 $.getJSON('/spectrogram/' + node.get('media').id + '/', function(data) {
                     that.$el.find('.spectrogram-image').attr('src', data.url);
                 });
@@ -385,28 +452,26 @@
             this.setNode(node);
         },
         setNode:function(node){
-            this.render();
+            if(node) {
+                this.once('player:ready', function(){
+                    this._player('play', node.get('cursor'));
+                }, this);
+                this.render();
+            }
+        },
+        setCurrentTime:function(time){
+            var duration = this._playerData.status.duration;
+            if(duration > 0)
+                this._player('playHead', time * 100.0 / this._playerData.status.duration);
         },
         playCurrent:function(){
-            var node = this.model.current();
-            if (node) {
-                this.setNode(node);
-                this._player.media.play();
-            }
+            this.setNode(this.model.current());
         },
         playNext:function(){
-            var node = this.model.next();
-            if (node) {
-                this.setNode(node);
-                this._player.media.play();
-            }
+            this.setNode(this.model.next());
         },
         playPrevious:function(){
-            var node = this.model.previous();
-            if (node) {
-                this.setNode(node);
-                this._player.media.play();
-            }
+            this.setNode(this.model.previous());
         },
         innerContainerMouseMoved: function (e) {
             var offsetLeft = relativeOffset(e).left;
@@ -416,28 +481,30 @@
             $cc.css("left", offsetLeft - ($cc.width() / 2));
         },
         innerContainerClicked: function (e) {
-            if (this._player.media.paused) {
-                this._player.media.play();
+            if (this._playerData.status.paused) {
+                this._player('play');
             } else {
                 var pc = relativeOffset(e).left / (this.getSpectrogramWidth() / 100);
-                var newTime = (this._player.media.duration / 100) * pc;
-                this._player.media.setCurrentTime(newTime);
+                var newTime = (this._playerData.status.duration / 100) * pc;
+                this._player('play', newTime);
             }
         },
         commentCursorClicked: function (e) {
+            this._player('pause');
             var $cc = $(e.target);
             e.stopPropagation();
             
             var pc = relativeOffset(e, this.$el.find('.spectrogram')).left / (this.getSpectrogramWidth() / 100);
-            var clickedTime = this._player.media.duration / 100 * pc;
+            var clickedTime = this._playerData.status.duration / 100 * pc;
             
-            this._player.media.pause()
-            app.form.open('bookmark', {
-                time:clickedTime,
-                media:this.model.current().get('media').id,
+            var node = this.model.current();
+            var media = node.get('media');
+            var form = new tc.FormCreateBookmark({
+                media: media._id,
+                ctime: clickedTime,
             });
             
-//             var $cc = this.$el.find('.comment-cursor');
+            this.$el.append(form.render().el);
             
             $cc
             .clone()

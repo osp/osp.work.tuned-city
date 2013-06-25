@@ -1,12 +1,24 @@
 <!-- media player -->
-<% if(data.url !== ''){ %>
-<h2>Currently watching: <br /> <%- data.url %></h2>
-<% } %>
-<div>
-<button class="previous"><%= data.previous %></button>
-    <video id="mediaelement-player" src="<%= data.url %>" width="320" height="240"></video>
+
+<h2>Currently watching: </h2>
+<div> <%- data.url %> </div>
+
+<div class="nav">
+    <button class="previous"><%= data.previous %></button>
     <button class="next"><%= data.next %></button>
 </div>
+
+<div id="player"></div>
+<div class="controls">
+<span class="play">play</span>
+<span class="pause">pause</span>
+<span class="mute">mute</span>
+<span class="unmute">unmute</span>
+<span class="currentTime"></span>
+<span class="duration"></span>
+</div>
+
+
 <div class="spectrogram">
     <div class="progress"></div>
     <div class="cursor"></div>
@@ -16,5 +28,5 @@
         <div class="comment-cursor" style="left: 1px;"></div>
     </div>
 </div>
-<br />
+
 <button class="upload">Add Media</button>

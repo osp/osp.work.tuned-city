@@ -1,0 +1,8 @@
+<select name="shelf">
+<% for(var i = 0; i < data.shelves.length; i++){ var s=data.shelves[i]; %>
+<option value="<%= s._id %>"><%- s.title %></option>
+<% } %>
+</select>
+<textarea name="note" ></textarea>
+<button class="close">close</button>
+<button class="submit">submit</button>

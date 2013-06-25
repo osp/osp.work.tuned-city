@@ -106,11 +106,17 @@
             this.registerComponent('shelf', new tc.ShelfCollectionView);
             this.registerComponent('paths', new tc.PathCollectionView);
             this.registerComponent('player', new tc.PathView({model:new tc.Path}));
-            this.registerComponent('connections', new tc.ConnectionWidget);
+//             this.registerComponent('connections', new tc.ConnectionWidget);
         },
         
         start: function(){
-            this.getView('shelf').collected.fetch();
+            var $wait = $('<h1>Waiting for data to load, please be patient</h1>');
+            this.getView('shelf').collected.on('reset', function(){
+                $wait.remove();
+                this.trigger('ready');
+            }, this);
+            this.getView('shelf').collected.fetch({reset: true});
+            $wait.appendTo(this.el);
         },
         setPath: function(pid_or_elts){
             if(typeof pid_or_elts === 'string')
@@ -124,6 +130,7 @@
             that.current_path = tc.Path(pid, {
                 onDataComplete:function(e){
                     that.getView('player').loadPath(that.current_path);
+                    this.getView('player').playCurrent();
                 }
             });
         },
@@ -131,6 +138,7 @@
             this.current_path = new tc.Path({_id:'Bookmark_P'});
             this.current_path.elements = elts;
             this.getView('player').loadPath(this.current_path);
+            this.getView('player').playCurrent();
         },
  
     });
