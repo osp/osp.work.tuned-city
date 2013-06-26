@@ -1,8 +1,21 @@
-<select name="shelf">
-<% for(var i = 0; i < data.shelves.length; i++){ var s=data.shelves[i]; %>
-<option value="<%= s._id %>"><%- s.title %></option>
-<% } %>
-</select>
-<input type="file" name="media" />
-<button class="close">close</button>
-<button class="submit">submit</button>
+
+<div class="content">
+    <div class="label">
+        Select a shelf
+    </div>
+    <select name="shelf">
+    <% for(var i = 0; i < data.shelves.length; i++){ var s=data.shelves[i]; %>
+    <option value="<%= s._id %>"><%- s.title %></option>
+    <% } %>
+    </select>
+    
+    <div class="label">
+        Select a media file
+    </div>
+    <input type="file" name="media" />
+</div>
+
+<div class="buttons">
+    <button class="close">close</button>
+    <button class="submit">submit</button>
+</div>

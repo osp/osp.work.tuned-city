@@ -1,4 +1,11 @@
-Path title: <input class='title' val="<%- data.title %>" type="text" />
+<!-- connection widget -->
+
+<div class="boxtitle">Path Composition</div>
+
+<div class="head">
+    Title: <input class='title' val="<%- data.title %>" type="text" />
+</div>
+
 <%for(var i=0; i < data.connections.length; i++){ var conn = data.connections[i]; %>
 <div class="conn">
 <table>

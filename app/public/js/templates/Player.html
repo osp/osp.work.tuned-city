@@ -1,32 +1,37 @@
 <!-- media player -->
 
-<h2>Currently watching: </h2>
-<div> <%- data.url %> </div>
+<div class="title">media player <% if(data.url){ print('['+data.url+']'); } %></div>
 
-<div class="nav">
+
+<!--<div class="nav">
     <button class="previous"><%= data.previous %></button>
     <button class="next"><%= data.next %></button>
-</div>
+</div>-->
 
-<div id="player"></div>
+<div class="player-container">
+    <div class="player" />
+</div>
 <div class="controls">
-<span class="play">play</span>
-<span class="pause">pause</span>
-<span class="mute">mute</span>
-<span class="unmute">unmute</span>
-<span class="currentTime"></span>
-<span class="duration"></span>
+    <div class="control interactive play">play</div>
+    <div class="control interactive pause">pause</div>
+    <div class="control interactive mute">mute</div>
+    <div class="control interactive unmute">unmute</div>
+    <div class="control smaller">
+        <span class="currentTime smaller" /> | <span class="duration smaller" />
+    </div>
+    
+    <div class="control interactive upload">Add Media</div>
 </div>
 
-
-<div class="spectrogram">
-    <div class="progress"></div>
-    <div class="cursor"></div>
-    <div class="target" style="left: 1px;"></div>
-    <img class="spectrogram-image" />
-    <div class="comment">
-        <div class="comment-cursor" style="left: 1px;"></div>
+<div class="spectrogram-container">
+    <div class="spectrogram">
+        <div class="progress"></div>
+        <div class="cursor"></div>
+        <div class="target" style="left: 1px;"></div>
+        <img class="spectrogram-image" />
+        <div class="comment">
+            <div class="comment-cursor" style="left: 1px;"></div>
+        </div>
     </div>
 </div>
 
-<button class="upload">Add Media</button>
