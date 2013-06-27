@@ -110,14 +110,10 @@
         },
         
         start: function(){
-            var $wait = $('<h1>Waiting for data to load, please be patient</h1>');
-            this.getView('shelf').collected.on('reset', function(){
-                $wait.remove();
-                this.trigger('ready');
-            }, this);
             this.getView('shelf').collected.fetch({reset: true});
             this.getView('paths').collected.fetch({reset: true});
-            $wait.appendTo(this.el);
+            
+            this.trigger('ready');
         },
         setPath: function(pid_or_elts){
             if(typeof pid_or_elts === 'string')
