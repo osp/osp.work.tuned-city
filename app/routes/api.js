@@ -60,14 +60,14 @@ exports.post = function(req, res){
                             var _type = t.pop();
                             if(subtype === 'webm')
                             {
-                                if(type === 'video')
+                                if(_type === 'video')
                                     subtype = 'webmv';
                                 else
                                     subtype = 'webma';
                             }
                             if(subtype === 'ogg')
                             {
-                                if(type === 'audio')
+                                if(_type === 'audio')
                                     subtype = 'oga';
                                 else
                                     subtype = 'ogv';
