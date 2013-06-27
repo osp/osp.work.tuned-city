@@ -1,0 +1,201 @@
+@import "elements.less";
+
+@color1: rgb(38, 36, 88); // blue
+@color2: #77db8f;
+
+@text-width: 550px;
+
+/* layout */
+
+body {
+    padding: 48px;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 150px;
+}
+
+header {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 150px;
+    padding: 36px 4px;
+    .box-sizing(@sizing: border-box);
+}
+
+#path {
+    margin: 0 auto;
+    max-width: @text-width;
+    position: relative;
+}
+
+/* style */
+
+header {
+    text-align: center;
+    .gradient(@color: none, @stop: white, @start: rgba(255, 255, 255, 0));
+}
+
+footer {
+    .gradient(@color: none, @start: white, @stop: rgba(255, 255, 255, 0));
+}
+
+body {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    line-height: 32px;
+    color: @color1;
+    background-color: white;
+}
+
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+sup {
+    font-size: 66.6%;
+    vertical-align: 33.3%
+}
+
+h1 {
+    font-size: 28px;
+    line-height: 35px;
+    margin-bottom: 0;
+    font-weight: normal;
+    border-bottom: 3px solid @color1;
+    display: inline-block;
+}
+
+cite {
+    text-decoration: underline;
+}
+
+#path {
+    padding-top: 80px;
+}
+#path section {
+    margin-bottom: 32px;
+}
+
+.active {
+  color: @color2;
+}
+
+.active img {
+    width: auto;
+}
+
+.media {
+    text-align: center;
+    position: relative;
+}
+
+.audio {
+    border: 4px solid white;
+    padding: 4px;
+    margin: 0 auto;
+    width: 100px;
+}
+
+.slider {
+    width: 200px;
+    height: 3px;
+    background-color: @color2;
+}
+
+nav {
+    line-height: 24px;
+    width: 143px;
+    height: 143px;
+    position: fixed;
+    top: 150px;
+    left: 50%;
+    margin-left: -1 * ((@text-width / 2) + 143px + 20px);
+
+    span {
+        display: block;
+    }
+
+    .waypoint {
+        display: none;
+    }
+
+    .btn-play {
+        position: relative;
+        top: -24px;
+        left: -47px
+    }
+        
+    .btn-previous {
+        position: absolute;
+        top: 30%;
+        right: 50%;
+        text-align: right;
+        width: 200px;
+
+        &:before {
+            content: "⏮ ";
+        }
+    }
+
+    .btn-next {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+
+        &:after {
+            content: " ⏭";
+        }
+    }
+
+    .slider {
+        -webkit-transform: rotate(-45deg);
+        -webkit-transform-origin: 0% 0%;
+        position: relative;
+        top: 140px;
+    }
+}
+
+.handle {
+    display: block;
+    position: relative;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    background-color: @color1;
+    border-radius: 5px;
+}
+
+.connexion {
+    position: absolute;
+    top: 0;
+    width: 200px;
+    left: @text-width + 20px;
+
+    ul {
+        &:before {
+            content: "This path crosses";
+        }
+    }
+
+    li {
+        list-style-type: disc;
+        list-style-position: inside
+    }   
+}
+
+#logo {
+    position: fixed;
+    left: 50%;
+    margin-left: -520px;
+    text-align: right;
+    width: 200px;
+    z-index: 999;
+}
