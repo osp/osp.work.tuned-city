@@ -18,7 +18,7 @@
 }
 
 .widget-title{
-    .absPos(2px,0,auto,2px);
+    .absPos(2px,auto,auto,2px);
     color:white;
     font-weight:bold;
 /*     font-style:italic; */
@@ -251,21 +251,22 @@ button {
 
 
 .ConnectionWidget{
-    .absPos(50%,0,0,50%);
+    .absPos(50%,0,0,25%);
     overflow: auto;
     background-color: #ddd;
     padding:6px;
     .boxtitle{
         .widget-title;
     }
-    .cw_save{
-        .absPos(2px, 2px, auto, auto);
-        z-index:10000;
+    
+    .controls{
+        .absPos(2px,2px,auto,auto);
     }
+    
     .head{
         margin:32px 0 0 0 ;
     }
-    .new_conn{
+    .conn{
         td{
             vertical-align: top;
         }
@@ -279,13 +280,54 @@ button {
             min-height: 0;
             display: block;
         }
+        .in,.out{
+            width:100px;
+            .media-url{
+                font-style:italic;
+                font-size:10pt;
+            }
+            .media-at{
+                font-weight:bold;
+                font-size:11pt;
+                color:#666;
+            }
+        }
+        .annotation{
+            min-width:360px;
+            font-family:sans-serif;
+            color:#333;
+            font-size:10pt;
+        }
+        .del{
+            font-weight:bold;
+            font-size:16pt;
+            &:hover{
+                background-color:red;
+                border:1px solid red;
+            }
+        }
     }
 }
 
 .PathCollection{
-    .absPos(50%,50%,0,0);
+    .absPos(50%,75%,0,0);
     overflow: auto;
-    background-color: black;
+    background-color: #93EDB4;
+    padding: 32px 24px;
+    
+    .new-path{
+        .absPos(2px,2px,auto,auto);
+        z-index:10000;
+    }
+    
+    .path-title{
+        color:#333;
+        font-style:italic;
+    }
+    .trackpoints{
+        color:white;
+        font-weight:bold;
+    }
     h2{
         .widget-title;
     }

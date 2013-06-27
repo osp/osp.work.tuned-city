@@ -2,19 +2,13 @@
 
 <div class="boxtitle">Path Composition</div>
 
-<div class="head">
-    Title: <input class='title' val="<%- data.title %>" type="text" />
-</div>
-
-<%for(var i=0; i < data.connections.length; i++){ var conn = data.connections[i]; %>
-<div class="conn">
-<table>
-<tr>
-<td><span class="annotation"><%- conn.annotation %></span></td>
-<td><div class="in"><%- conn.start.note %></div></td>
-<td><div class="out"><%- conn.end.note %></div></td>
-<td><span class="del" id="Con_<%= conn._id %>">Delete</span></td>
-</tr>
-</table>
-</div>
+<% if(data._id){ %>
+    <div class="head">
+        Title: <input class='title' value="<%- data.title %>" type="text" />
+    </div>
+    
+    <div class='controls'>
+    <button class="add">add connection</button>
+    <button class="save">save</button>
+    </div>
 <% } %>

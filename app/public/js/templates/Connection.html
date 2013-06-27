@@ -1,0 +1,32 @@
+<div class="conn">
+<table>
+<tr>
+<td>
+    <div class="in drop" data-id="<%= data.start._id %>">
+    <% if(data.start.media){ %>
+        <p class="media-url"><%= data.start.media.url.split('/').pop() %></p> 
+        <p class="media-at">@ <%= Math.floor(data.start.cursor) %> </p>
+    <% }else{ %>
+        __IN__
+    <% } %>
+    </div>
+</td>
+<td>
+    <div class="out drop" data-id="<%= data.end._id %>">
+    <% if(data.end.media){ %>
+        <p class="media-url"><%= data.end.media.url.split('/').pop() %></p> 
+        <p class="media-at">@ <%= Math.floor(data.end.cursor) %> </p>
+    <% }else{ %>
+        __OUT__
+    <% } %>
+    </div>
+</td>
+<td>
+    <div>
+        <textarea class="annotation"><% if(data.annotation){print(data.annotation);} %></textarea>
+    </div>
+</td>
+<td><button class="del" id="del_nn">×</button></td>
+</tr>
+</table>
+</div>

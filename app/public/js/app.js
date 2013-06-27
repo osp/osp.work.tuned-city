@@ -105,7 +105,7 @@
             
             this.registerComponent('shelf', new tc.ShelfCollectionView);
             this.registerComponent('paths', new tc.PathCollectionView);
-            this.registerComponent('player', new tc.PathView({model:new tc.Path}));
+            this.registerComponent('player', new tc.PlayerView({model:new tc.Path}));
             this.registerComponent('connections', new tc.ConnectionWidget);
         },
         
@@ -116,6 +116,7 @@
                 this.trigger('ready');
             }, this);
             this.getView('shelf').collected.fetch({reset: true});
+            this.getView('paths').collected.fetch({reset: true});
             $wait.appendTo(this.el);
         },
         setPath: function(pid_or_elts){
@@ -139,6 +140,16 @@
             this.current_path.elements = elts;
             this.getView('player').loadPath(this.current_path);
             this.getView('player').playCurrent();
+        },
+        
+        resetPath:function(id){
+            var model = tc.PathCollection.get(id);
+            if(!model)
+            {
+                model = new tc.Path;
+                tc.PathCollection.add(model);
+            }
+            this.getView('connections').resetModel(model);
         },
  
     });
