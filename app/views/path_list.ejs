@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Tuned city</title>
+    <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+    <link rel='stylesheet' href='/stylesheets/reset.css' />
+</head>
+
+<body>
+
+    <ul>
+    <% for(var i=0; i<path_list.length; i++) {%>
+        <li><a href="/path/<%= path_list[i]._id %>"><%= path_list[i].title %></a> (<%= path_list[i].trackpoints.length %>)</li>
+    <% } %>
+    </ul>
+
+
+    <script src="../../app/public/js/lib/jquery.js"></script>
+    <script src="../../app/public/javascripts/jquery-ui/js/jquery-ui-1.10.2.custom.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Tuned city</title>
+    <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+    <link rel='stylesheet' href='/stylesheets/reset.css' />
+    <link rel='stylesheet' href='/stylesheets/path.css' />
+</head>
+
+<body>
+    <div id="logo">Tuned City Archive</div>
+
+    <section id="path">
+        <header>
+            <h1><%= path.title %></h1>
+        </header>
+
+        <nav id="main-controls">
+            <div class="slider"><a class="handle" style="left: 10%"></a></div>
+            <span class="btn-play">▸ walk through</span>
+            <span class="btn-previous">prev</span>
+            <span class="btn-next">next</span>
+            <span class="waypoint"><%= path.trackpoints.length %></span>
+        </nav>
+
+        <% for(var i=0; i<path.trackpoints.length; i++) {%>
+        <section class="media">
+            <img src="static/img/screenshot.jpg" /> 
+            <aside class="connexion">
+                <ul>
+                    <li>The Tuning Scores</li>
+                </ul>
+            </aside>
+        </section>
+
+        <section class="annotation">
+            <p>
+            In a nearly one hour long interview Burrows explains the way in which
+            he works with scores, giving mostly examples from his choreographies:
+            <cite>the film choreography Hands</cite> (1995), <cite>The Stop Quartet</cite> (1996), <cite>Both
+                Sitting Duet (2002)</cite>. <cite>Hands, made for television</cite> in 1995, for the
+            BBC/Arts Council, was the first time Jonathan worked with a score.
+            However, The Stop Quartet, a piece for four dancers made in 1996, is
+            the first score discussed here.
+            </p>
+        </section>
+        <% } %>
+    </section>
+    <footer></footer>
+
+
+    <script src="../../app/public/js/lib/jquery.js"></script>
+    <script src="../../app/public/javascripts/jquery-ui/js/jquery-ui-1.10.2.custom.js"></script>
+    <script src="static/js/init.js"></script>
+</body>
+</html>

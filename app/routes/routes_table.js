@@ -22,7 +22,7 @@ var api = {
 
 var web = {
     index:{url:'/', req:'./index', verb:'get'},
-    path:{url:'/path', req:'./path', verb:'get'},
+    path:{url:'/path/:path?', req:'./path', verb:'get'},
     jquerydynamicimg:{url:'/jquerydynamicimg.html', req:'./jquerydynamicimg', verb:'get'},
     poster:{url:'/poster/:id/:timestamp?', req:'./media', verb:'get'},
     spectrogram:{url:'/spectrogram/:id/', req:'./media', verb:'get'},
