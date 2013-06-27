@@ -6,38 +6,72 @@
 var Media = require('../models').Media;
 var Path = require('../models').Path;
 var Connection = require('../models').Connection;
+var Connection = require('../models').Cursor;
+var _ = require('underscore');
 
 exports.path = function(req, res){
+    
+    
+    var forwardTrackoints = function(trackpoints, response, ret){
+        Connection.find({'_id':{$in:trackpoints}}, function(err, connections){
+            if(err){response.status(500).send(err)}
+            else{
+                ret.trackpoints = [];
+                var cursors = [];
+                for(var c in connections){
+                    var connection = connections[c].toObject();
+                    cursors.push(connection.start);
+                    cursors.push(connection.end);
+                    ret.trackpoints.push(connection);
+                }
+                Cursor.find({'_id':{$in:cursors}},function(err, cursors){
+                    if(err){response.status(500).send(err)}
+                    else{
+                        var medias = [];
+                        _.reduce(cursors, function(memo, value, index, list){
+                            for(t in memo)
+                            {
+                                var cursor = value.toObject();
+                                if(memo[t].start === cursor._id)
+                                    memo[t].start = cursor;
+                                if(memo[t].end === cursor._id)
+                                     memo[t].end = cursor;
+                                if(!(cursor.media in medias))
+                                    medias.push(cursor.media);
+                                return memo;
+                            }
+                        }, ret.trackpoints);
+                        Media.find({'_id':{$in:medias}},function(err, medias){
+                            _.reduce(medias, function(memo, value){
+                                for(t in memo)
+                                {
+                                    var media = value.toObject();
+                                    if(memo[t].start.media === media._id)
+                                        memo[t].start.media = media;
+                                    if(memo[t].end.media === media._id)
+                                        memo[t].end.media = media;
+                                }
+                                return memo;
+                            }, ret.trackpoints);
+                        });
+                    }
+                });
+            }
+        });
+    };
+    
 
     if ('path' in req.params && req.params['path'] != undefined) {
         // A path id was specified, so we search for it in order to pass it the template
-        console.log('path is specified');
 
         Path 
         .findById(req.params['path'])
-        .populate('trackpoints')
         .exec(function (err, path) {
-            if (err) return handleError(err);
-
-            //var mia = [];
-            //Object.keys(media_ids).forEach(function(k){
-                //console.log('Ok : '+k);
-                //mia.push(media_ids[k]);
-            //});
-            var trackpoints = [];
-            for (var i = 0; i < path.trackpoints.length; i++) {
-                Connection
-                .findById(path.trackpoints[i]._id)
-               // .populate('start end')
-                .exec(function (err, con) {
-                    console.log('push con',con);
-                    trackpoints.push(con);
-                });
-            };
-            console.log(path.trackpoints.length, trackpoints.length);
-            path.trackpoints = trackpoints;
-
-            res.render('path_detail', {path: path});
+            if (err) res.status(500).send(err);
+            else{
+                forwardTrackoints(_.clone(path.trackpoints), res, path );
+                res.render('path_detail', {path: path});
+            }
 
         });
     } else {
@@ -52,45 +86,4 @@ exports.path = function(req, res){
             };
         });
     };
-
-    //Path.find({}, function(err, ps){
-        //if(err)
-        //{
-            //console.log('Error: ' + err);
-        //}
-        //else
-        //{
-            //var media_ids = {};
-            //for(var i=0; i < ps.length; i++)
-            //{
-                //var cns = ps[i].trackpoints.toObject();
-                //for(var c = 0; c < cns.length; c++)
-                //{
-                    //var con = cns[c];
-                    //media_ids[con.start.media.toString()] = con.start.media;
-                    //media_ids[con.end.media.toString()] = con.end.media;
-                //}
-            //}
-            //var mia = [];
-            //Object.keys(media_ids).forEach(function(k){
-                //console.log('Ok : '+k);
-                //mia.push(media_ids[k]);
-            //});
-            //Media.find({'_id':{$in:mia}}, function(err, medias){
-                //if(err){
-                    //console.log(err);
-                //}
-                //else
-                //{
-                    //console.log('Found medias:');
-                    //for(var i=0; i < medias.length; i++)
-                    //{
-                        //console.log('> '+medias[i].url);
-                    //}
-                    //res.render('index', { title: 'Index',  medias:medias, paths:ps});
-                //}
-            //});
-            
-        //}
-    //});
 };
