@@ -29,7 +29,7 @@ exports.path = function(req, res){
                     
                     ret.trackpoints.push(connection);
                 }
-                // console.log('ret.trackpoints', ret.trackpoints);
+//                 console.log('ret.trackpoints', ret.trackpoints);
                 Cursor.find({'_id':{$in:cursors}}, function(err, cursors){
                     if(err){
                         // console.warn(err);
@@ -37,18 +37,25 @@ exports.path = function(req, res){
                     else{
                         var ms = [];
                         _.reduce(cursors, function(memo, value, index, list){
+                            var cursor = value.toObject();
                             for(var t in memo)
                             {
-                                // console.log('memo', t, memo[t]);
-                                var cursor = value.toObject();
-                                if(memo[t].start === cursor._id)
+//                                 console.log(t, memo[t].start.toString(), ' === ', cursor._id.toString(), 
+//                                             (memo[t].start.toString()  ===  cursor._id.toString()));
+                                if( !memo[t].start._id
+                                    && memo[t].start.toString() === cursor._id.toString())
+                                {
                                     memo[t].start = cursor;
-                                if(memo[t].end === cursor._id)
+                                }
+                                if( !memo[t].end._id
+                                    && memo[t].end.toString() === cursor._id.toString())
+                                {
                                      memo[t].end = cursor;
+                                }
                                 if(!(cursor.media in ms))
                                     ms.push(cursor.media);
-                                return memo;
                             }
+                            return memo;
                         }, ret.trackpoints);
                         Media.find({'_id':{$in:ms}},function(err, medias){
                             if(err){
@@ -57,18 +64,33 @@ exports.path = function(req, res){
                             else
                             {
                                 _.reduce(medias, function(memo, value){
+                                    var media = value.toObject();
                                     for(var t in memo)
                                     {
-                                        // console.log('media',value);
-                                        // console.log('memo', t, memo[t]);
-                                        var media = value.toObject();
-                                        if(memo[t].start.media === media._id)
+                                        if(memo[t].start.media.toString() === media._id.toString())
+                                        {
                                             memo[t].start.media = media;
-                                        if(memo[t].end.media === media._id)
+//                                             console.log('>>', memo[t].start.media);
+                                        }
+                                        if(memo[t].end.media.toString() === media._id.toString())
+                                        {
                                             memo[t].end.media = media;
+//                                             console.log('<<', memo[t].end.media);
+                                        }
+//                                         console.log('memo', t, memo[t]);
                                     }
                                     return memo;
                                 }, ret.trackpoints);
+                                
+                                
+                                
+//                         console.log('******************************************');
+//                         console.log(ret.trackpoints);
+//                         console.log('******************************************');
+                                
+                                res.render('path_detail', {path: ret});
+                                
+                                
                             }
                         });
                     }
@@ -87,8 +109,7 @@ exports.path = function(req, res){
             if (err) res.status(500).send(err);
             else{
                 var p = path.toObject();
-                forwardTrackoints(_.clone(path.trackpoints), res, p );
-                res.render('path_detail', {path: p});
+                forwardTrackoints(_.clone(p.trackpoints), res, p );
             }
 
         });
