@@ -150,8 +150,13 @@ textarea {
     .Shelf .shelf-items {
         display: none;
     }
+    
+    .shelf-title{
+        cursor:pointer;
+    }
+    
     .Shelf .shelf-title:before {
-        content: "\2192";
+        content: "\2192  ";
         /*display: inline-block;*/
         width: 1em;
     }
@@ -159,7 +164,7 @@ textarea {
         display: block;
     }
     .Shelf.uncollapsed .shelf-title:before {
-        content: "\2193";
+        content: "\2193  ";
         display: inline-block;
         width: 1em;
     }
@@ -323,6 +328,11 @@ button {
     .path-title{
         color:#333;
         font-style:italic;
+        cursor:pointer;
+        
+        &:hover{
+            color:#FF8000;
+        }
     }
     .trackpoints{
         color:white;
