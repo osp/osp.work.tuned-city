@@ -27,7 +27,10 @@
 
         <% for(var i=0; i<path.trackpoints.length; i++) {%>
         <section class="media">
-            <%= path.trackpoints[i] %>
+            <%= path.trackpoints[i].start.media.url %>
+            <%= path.trackpoints[i].start.cursor %>
+            <%= path.trackpoints[i].end.media.url %>
+            <%= path.trackpoints[i].end.cursor %>
             <aside class="connexion">
                 <ul>
                     <li>The Tuning Scores</li>
@@ -43,8 +46,8 @@
     <footer></footer>
 
 
-    <script src="../../app/public/js/lib/jquery.js"></script>
-    <script src="../../app/public/javascripts/jquery-ui/js/jquery-ui-1.10.2.custom.js"></script>
-    <script src="static/js/init.js"></script>
+    <script src="/js/lib/jquery.js"></script>
+    <script src="/javascripts/jquery-ui/js/jquery-ui-1.10.2.custom.js"></script>
+    <!--<script src="/js/init.js"></script>-->
 </body>
 </html>
