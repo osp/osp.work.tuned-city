@@ -27,7 +27,7 @@
 
         <% for(var i=0; i<path.trackpoints.length; i++) {%>
         <section class="media">
-            <img src="static/img/screenshot.jpg" /> 
+            <%= path.trackpoints[i] %>
             <aside class="connexion">
                 <ul>
                     <li>The Tuning Scores</li>
@@ -36,15 +36,7 @@
         </section>
 
         <section class="annotation">
-            <p>
-            In a nearly one hour long interview Burrows explains the way in which
-            he works with scores, giving mostly examples from his choreographies:
-            <cite>the film choreography Hands</cite> (1995), <cite>The Stop Quartet</cite> (1996), <cite>Both
-                Sitting Duet (2002)</cite>. <cite>Hands, made for television</cite> in 1995, for the
-            BBC/Arts Council, was the first time Jonathan worked with a score.
-            However, The Stop Quartet, a piece for four dancers made in 1996, is
-            the first score discussed here.
-            </p>
+            <%= path.trackpoints[i].annotation %>
         </section>
         <% } %>
     </section>
