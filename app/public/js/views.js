@@ -638,16 +638,19 @@
         
         add_row:function(){
             var self = this;
-            var conn = tc.ConnectionCollection.create({
-                start:0,
-                end:0,
-                annotation:'Annotation',
-            })
-            .on('sync', function(model){
-                var cids = _.clone(self.model.get('trackpoints'));
-                cids.push(model.id);
-                self.model.set({trackpoints:cids});
+            this.model.once('sync', function(){
+                var conn = tc.ConnectionCollection.create({
+                    start:0,
+                    end:0,
+                    annotation:'Annotation',
+                })
+                .once('sync', function(model){
+                    var cids = _.clone(self.model.get('trackpoints'));
+                    cids.push(model.id);
+                    self.model.set({trackpoints:cids});
+                });
             });
+            this.save();
         },
         
         save:function(){
