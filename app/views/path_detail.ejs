@@ -25,22 +25,32 @@
             <span class="waypoint"><%= path.trackpoints.length %></span>
         </nav>
 
-        <% for(var i=0; i<path.trackpoints.length; i++) {%>
+        <% for(var i = 0; i < (path.trackpoints.length - 1); i++) { %>
+        
+        <% var current = path.trackpoints[i]; %>
+        <% var next = path.trackpoints[i + 1]; %>
+        <% var media = current.end.media; %>
+        
+        <section class="annotation">
+            <%= current.annotation %>
+        </section>
+        
         <section class="media">
-            <%= path.trackpoints[i].start.media.url %>
-            <%= path.trackpoints[i].start.cursor %>
-            <%= path.trackpoints[i].end.media.url %>
-            <%= path.trackpoints[i].end.cursor %>
+        
+            <div class="player"
+                data-media="<%= media.url %>"
+                data-type="<%= media.type %>"
+                data-start="<%= current.end.cursor %>"
+                data-stop="<%= next.start.cursor %>" > </div>
+            
             <aside class="connexion">
                 <ul>
                     <li>The Tuning Scores</li>
                 </ul>
             </aside>
+            
         </section>
 
-        <section class="annotation">
-            <%= path.trackpoints[i].annotation %>
-        </section>
         <% } %>
     </section>
     <footer></footer>
@@ -48,6 +58,85 @@
 
     <script src="/js/lib/jquery.js"></script>
     <script src="/javascripts/jquery-ui/js/jquery-ui-1.10.2.custom.js"></script>
-    <!--<script src="/js/init.js"></script>-->
+    <script src="/javascripts/jquery.jplayer.min.js"></script>
+    <script>
+    $(document).ready(function(){
+        
+        var getData = function(attr){
+            return this.attr('data-'+attr);
+        };
+        
+        $.fn.getData = getData;
+        
+        var controller = $('#main-controls');
+        
+        var players = $('.player');
+        players.each(function(idx, el){
+            var that = $(this);
+            var media = {};
+            var mt = that.getData('type').split('/').pop();
+            var start = that.getData('start');
+            var stop = that.getData('stop');
+            media[mt] = that.getData('media');
+            
+            that.jPlayer({
+                ready: function(){ 
+                        $(this).jPlayer("setMedia", media); 
+                    },
+                    swfPath: "/javascripts/Jplayer.swf",
+                    supplied: mt,
+                    size: {
+                        width: "600px",
+                    }
+            });
+            
+            var status = that.data('jPlayer').status;
+            var player = function(){
+                    that.jPlayer.apply(that, arguments);
+                };
+            
+            var parent = that.parent();
+            var control_play = $('<div />')
+                .addClass('control play')
+                .text('play');
+            var control_pause = $('<div />')
+                .addClass('control pause')
+                .text('pause');
+            
+            
+            control_play.on('click', function(evt){
+                player('play', Math.max(start, status.currentTime));
+            });
+            
+            control_pause.on('click', function(evt){
+                player('pause');
+            });
+            
+            that.on($.jPlayer.event.play, function(){
+                control_pause.show();
+                control_play.hide();
+            });
+            
+            that.on($.jPlayer.event.pause, function(){
+                control_pause.hide();
+                control_play.show();
+            });
+            
+            that.on($.jPlayer.event.timeupdate, function(evt){
+                if(evt.jPlayer.status.currentTime > stop)
+                {
+                    player('stop');
+                    controller.trigger('play', [idx + 1]);
+                }
+            });
+            
+            parent.append(control_play);
+            parent.append(control_pause);
+            control_pause.hide();
+            
+        });
+        
+    });
+    </script>
 </body>
 </html>

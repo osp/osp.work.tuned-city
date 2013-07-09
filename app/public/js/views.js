@@ -431,7 +431,7 @@
                         self._playerReady = true;
                         self.trigger('player:ready');
                     },
-                    swfPath: "/javascript/Jplayer.swf",
+                    swfPath: "/javascripts/Jplayer.swf",
                     supplied: subtype,
                     cssSelectorAncestor: "#mediaplayer .controls",
                     cssSelector: {
