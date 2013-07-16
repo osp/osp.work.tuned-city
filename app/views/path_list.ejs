@@ -15,6 +15,31 @@
     
     <style>
     
+    .clearfix:after {
+        content: ".";
+        display: block;
+        clear: both;
+        visibility: hidden;
+        line-height: 0;
+        height: 0;
+    }
+    
+    .clearfix {
+            display: inline-block;
+    }
+    
+    html[xmlns] .clearfix {
+            display: block;
+    }
+    
+    * html .clearfix {
+            height: 1%;
+    }
+    
+    body{
+        background-color:#eee;
+    }
+    
     .content{
         margin:32px;
     }
@@ -28,6 +53,7 @@
         font-size:22pt;
         font-family:Oswald;
         color:#77db8f;
+        margin-top: 6px;
     }
     
     .path_list_box{
@@ -39,12 +65,15 @@
     }*/
     
     .path_item{
-        width:180px;
+        width:280px;
         float:left;
-        margin:12px;
+        margin:12px 24px 12px 0;
         height:180px;
         overflow:hidden;
-/*         border:1px solid; */
+/*         overflow-y:auto; */
+        background-color:white;
+        border-left:2px solid white;
+        padding:8px 8px 8px 6px;
     }
     
     .path_link{
@@ -52,6 +81,10 @@
         font-family:Oswald;
         font-size:16pt;
         color: black;
+    }
+    
+    .path_item:hover{
+        border-left:2px solid #77db8f;
     }
     
     .path_item:hover .path_link{
@@ -62,18 +95,50 @@
         margin-top:6px;
     }
     
+    <% var annot_fs = 12 ; %>
+    
     .annotation{
-        font-family:serif;
-        font-style:italic;
+        font-family:Karla;
+        line-height:<%= annot_fs %>pt;
     }
     
-    <% var annot_fs = 14 ; %>
     <% for(var i=0; i < MAX_ANNOTATIONS; i++){ %>
     <% var fs = (annot_fs * (MAX_ANNOTATIONS - i) / MAX_ANNOTATIONS); %>
     .annot_<%= i %> {
         font-size: <%= fs %>pt;
     }
     <% } %>
+    
+    .rationale{
+        font-family:Karla;
+        font-size:10pt;
+        line-height:13pt;
+        margin-top:16px;
+    }
+    
+    .rationale div{
+        margin: 1%;
+        width: 29%;
+        float:left;
+        min-width:220pt;
+    }
+    
+    .rationale div:first-child{
+        margin-left:0;
+    }
+    
+    .rationale div a{
+        color:black;
+/*         font-weight:bold; */
+        font-style:italic;
+        font-size:110%;
+        text-decoration:none;
+    }
+    .rationale div a:hover{
+        color:#77db8f;
+        border-bottom:1px solid;
+    }
+    
     
     </style>
     
@@ -88,6 +153,10 @@
         An archiving experiment towards digital sound spaces for Tuned City Brussels.
         </div>
         
+        <div class="rationale clearfix">
+        <%= include partials/intro.ejs %>
+        </div>
+        
         <div class="path_list_box">
 <!--             <ul class="path_list"> -->
             <% for(var i=0; i<path_list.length; i++) {%>
@@ -98,7 +167,7 @@
                     <% var T = text[ path_list[i]._id ]; %>
                     <% for(var tid in T){ if(tid >= MAX_ANNOTATIONS){break;} var t=T[tid]; %>
                         <p class="annotation annot_<%= tid %>" >
-                        <%= t %>
+                        <%= t.split(' ').slice(0,24).join(' ') %>
                         </p>
                     <% } %>
                     </div>
