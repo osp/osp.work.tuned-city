@@ -325,18 +325,39 @@ button {
         z-index:10000;
     }
     
-    .path-title{
-        color:#333;
-        font-style:italic;
-        cursor:pointer;
+    .path{
+        padding:2px;
+        .PathDelete{
+            display: none;
+            float:right;
+            font-size:14pt;
+            font-weight:bold;
+            cursor:pointer;
+            &:hover{
+                color:red;
+            }
+        }
         
         &:hover{
-            color:#FF8000;
+            background-color:lighten(#93EDB4, 10%); 
+            .PathDelete{
+                display:block;
+            }
         }
-    }
-    .trackpoints{
-        color:white;
-        font-weight:bold;
+        
+        .path-title{
+            color:#333;
+            font-style:italic;
+            cursor:pointer;
+            
+            &:hover{
+                color:#FF8000;
+            }
+        }
+        .trackpoints{
+            color:white;
+            font-weight:bold;
+        }
     }
     h2{
         .widget-title;

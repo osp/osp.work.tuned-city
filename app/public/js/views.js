@@ -328,6 +328,13 @@
         events:{
             'click .new-path-submit':'newPath',
             'click .path-title':'editPath',
+            'click .PathDelete':'delete_path',
+        },
+        
+        delete_path:function(evt){
+            var id = evt.currentTarget.id.split('_').pop();
+            var model = this.collected.get(id);
+            model.destroy({wait: true});
         },
         
         newPath:function(){
