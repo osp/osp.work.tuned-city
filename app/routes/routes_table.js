@@ -3,6 +3,8 @@
  */
 
 var extend = require('underscore').extend;
+var settings = require('../settings').settings
+
 
 
 var api = {
@@ -20,9 +22,8 @@ var api = {
     
 };
 
-var web = {
+var admin = {
     index:{url:'/', req:'./index', verb:'get'},
-    path:{url:'/path/:path?', req:'./path', verb:'get'},
     jquerydynamicimg:{url:'/jquerydynamicimg.html', req:'./jquerydynamicimg', verb:'get'},
     poster:{url:'/poster/:id/:timestamp?', req:'./media', verb:'get'},
     spectrogram:{url:'/spectrogram/:id/', req:'./media', verb:'get'},
@@ -30,13 +31,26 @@ var web = {
     cross:{url:'/cross/:ca/:cb', req:'./cross', verb:'get'},
 };
 
-var routes = extend(web,api);
+var admin_routes = extend(admin,api);
 
-exports.init = function(app){
-    for(var k in routes)
+var www_routes = {
+    path:{url:'/:path?', req:'./path', verb:'get'},
+};
+
+var routes = { };
+routes[settings.vhosts.admin] = admin_routes;
+routes[settings.vhosts.www] = www_routes;
+
+
+exports.init = function(apps){
+    for(var host in apps)
     {
-        var r = routes[k];
-        var f = require(r.req)[k];
-        app[r.verb](r.url, f);
+        var app = apps[host];
+        for(var k in routes[host])
+        {
+            var r = routes[host][k];
+            var f = require(r.req)[k];
+            app[r.verb](r.url, f);
+        }
     }
 };
