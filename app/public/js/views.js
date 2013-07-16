@@ -178,14 +178,39 @@
             this.trigger('error', jqXHR, textStatus, errorThrown);
         },
         sync:function(method, model, options){
+
             
             if(model.get('media') && model.get('shelf')) // want to upload
             {
+                var that = this;
                 var formdata = new FormData();
                 var f = this.get('media');
                 this.fileName = f.name;
                 formdata.append('media', f);
                 $.ajax({  
+                    xhr: function() {
+                      var xhr = new window.XMLHttpRequest();
+                      //Upload progress
+                      xhr.upload.addEventListener("progress", function(evt){
+                        if (evt.lengthComputable) {
+                          var percentComplete = evt.loaded / evt.total;
+                          //Do something with upload progress
+                          if (options.progress) {
+                                options.progress.apply(that, [percentComplete])
+                          };
+                          console.log(percentComplete);
+                        }
+                      }, false);
+                      //Download progress
+                      xhr.addEventListener("progress", function(evt){
+                        if (evt.lengthComputable) {
+                          var percentComplete = evt.loaded / evt.total;
+                          //Do something with download progress
+                          console.log(percentComplete);
+                        }
+                      }, false);
+                      return xhr;
+                    },
                     url: this.url(),  
                     type: "POST",  
                     data: formdata,  
@@ -224,11 +249,38 @@
             var $media = this.$el.find('[name=media]');
             var $shelf = this.$el.find('[name=shelf]');
             
-            var f = $media[0].files[0];
+            var files = $media[0].files;
             var s = $shelf.val();
-            
-            var media = tc.MediaCollection.create({media:f, shelf:s},{wait: true});
-            this.close();
+
+            var to_remain = files.length; 
+            var that = this;
+
+            for (var i = 0; i < files.length; i++) {
+
+                var $file = $('<div>').addClass('file'); 
+                var $filename = $('<div>').addClass('filename'); 
+                var $progressBar = $('<div>').addClass('progress-bar'); 
+                var $progress = $('<div>').addClass('progress'); 
+                    
+                $filename.text(files[i].name);
+
+                $progressBar.append($progress);
+                $file.append($filename);
+                $file.append($progressBar);
+
+                $("#progress-list").append($file);
+
+                var media = tc.MediaCollection.create({media:files[i], shelf:s},{wait: true, progress: function(pc) {
+                    $progress.width((pc * 100) + '%');
+                }});
+                media.on('sync', function() {
+                    $file.remove();
+                    to_remain--;
+                    if (to_remain === 0) {
+                        that.close();
+                    };
+                });
+            };
         },
     });
     
