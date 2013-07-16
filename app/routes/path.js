@@ -99,6 +99,7 @@ exports.path = function(req, res){
         });
     };
     
+    
 
     if ('path' in req.params && req.params['path'] != undefined) {
         // A path id was specified, so we search for it in order to pass it the template
@@ -120,8 +121,27 @@ exports.path = function(req, res){
                 // console.log('Error: ' + err);
             }
             else {
-                // console.log(ps);
-                res.render('path_list', {path_list: ps});
+                text = {};
+                
+                var getText = function(idx){
+                    if(idx == ps.length)
+                    {
+                        return res.render('path_list', {
+                            path_list: ps,
+                            text: text
+                        });
+                    }
+                    var P = ps[idx];
+                    Connection.find({'_id':{$in:P.trackpoints}}, function(err, connections){
+                        text[P._id] = [];
+                        _.each(connections, function(con, i){
+                            text[P._id].push(con.annotation);
+                        });
+                        getText(idx + 1);
+                    });
+                };
+                
+                getText(0);
             };
         });
     };
