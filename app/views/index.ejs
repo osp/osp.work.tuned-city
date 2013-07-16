@@ -10,6 +10,13 @@
     <link rel='stylesheet' href='/stylesheets/reset.css' />
     <link rel='stylesheet' href='/stylesheets/style.css' />
     
+    <script>
+    var tc.Config = {};
+    <% for(var k in config){ %>
+    tc.Config['<%= k %>'] =  '<%= config[k] %>';
+    <% } %>
+    </script>
+    
     <script src="/js/lib/underscore-min.js"></script>
     <script src="/js/lib/jquery.js"></script>
     <script src="/js/lib/backbone.js"></script>

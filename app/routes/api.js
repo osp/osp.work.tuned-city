@@ -73,7 +73,7 @@ exports.post = function(req, res){
                                     subtype = 'ogv';
                             }
                             var obj = {
-                                url:  media_url + fname,
+                                url:  fname,
                                  type: _type+'/'+subtype,
                             };
                             var mm = new models.Media(obj);
