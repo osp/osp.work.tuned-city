@@ -161,7 +161,7 @@
 <!--             <ul class="path_list"> -->
             <% for(var i=0; i<path_list.length; i++) {%>
                 <div class="path_item">
-                    <a class="path_link" href="/path/<%= path_list[i]._id %>"><%= path_list[i].title %></a> 
+                    <a class="path_link" href="/<%= path_list[i]._id %>"><%= path_list[i].title %></a> 
 <!--                     (<%= path_list[i].trackpoints.length %>) -->
                     <div class="path_text">
                     <% var T = text[ path_list[i]._id ]; %>
