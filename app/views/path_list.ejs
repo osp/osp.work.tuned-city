@@ -5,19 +5,28 @@
     <meta charset="utf-8"/>
     <title>Tuned city</title>
     <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Karla:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
     <link rel='stylesheet' href='/stylesheets/reset.css' />
+    <link rel='stylesheet' href='/stylesheets/path.css' />
 </head>
 
 <body>
+    <div id="logo">Tuned City Brussels<br />Archive | Archief</div>
 
-    <ul>
-    <% for(var i=0; i<path_list.length; i++) {%>
-        <li><a href="/path/<%= path_list[i]._id %>"><%= path_list[i].title %></a> (<%= path_list[i].trackpoints.length %>)</li>
-    <% } %>
-    </ul>
+    <section id="path">
+        <div class="karla">
+        <% include partials/intro.ejs %>
+        </div>
 
+        <ul id="path-list">
+        <% for(var i=0; i<path_list.length; i++) {%>
+            <li><a href="/path/<%= path_list[i]._id %>"><%= path_list[i].title %></a> (<%= path_list[i].trackpoints.length %>)</li>
+        <% } %>
+        </ul>
+    </section>
 
-    <script src="../../app/public/js/lib/jquery.js"></script>
-    <script src="../../app/public/javascripts/jquery-ui/js/jquery-ui-1.10.2.custom.js"></script>
+    <script src="/js/lib/jquery.js"></script>
+    <script src="/javascripts/jquery-ui/js/jquery-ui-1.10.2.custom.js"></script>
 </body>
 </html>
+

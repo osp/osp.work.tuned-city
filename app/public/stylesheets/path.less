@@ -5,6 +5,9 @@
 
 @text-width: 550px;
 
+@font-size: 18px;
+@line-height: 32px;
+
 /* layout */
 
 body {
@@ -29,6 +32,15 @@ header {
     .box-sizing(@sizing: border-box);
 }
 
+#logo {
+    position: fixed;
+    left: 50%;
+    margin-left: -520px;
+    text-align: right;
+    width: 200px;
+    z-index: 999;
+}
+
 #path {
     margin: 0 auto;
     max-width: @text-width;
@@ -48,8 +60,8 @@ footer {
 
 body {
     font-family: 'Oswald', sans-serif;
-    font-size: 18px;
-    line-height: 32px;
+    font-size: @font-size;
+    line-height: @line-height;
     color: @color1;
     background-color: white;
 }
@@ -57,6 +69,12 @@ body {
 a {
     color: inherit;
     text-decoration: inherit;
+    &:hover {
+        border-bottom: 2px solid @color1;
+    }
+    &:active {
+        color: red;
+    }
 }
 
 sup {
@@ -77,11 +95,16 @@ cite {
     text-decoration: underline;
 }
 
+#path-list {
+    .columns(0, 3, 36px, none, none, 0);
+}
+
 #path {
     padding-top: 80px;
 }
+
 #path section {
-    margin-bottom: 32px;
+    margin-bottom: @line-height;
 }
 
 .active {
@@ -110,7 +133,8 @@ cite {
     background-color: @color2;
 }
 
-nav {
+// controls
+nav#main-controls {
     line-height: 24px;
     width: 143px;
     height: 143px;
@@ -119,12 +143,27 @@ nav {
     left: 50%;
     margin-left: -1 * ((@text-width / 2) + 143px + 20px);
 
-    span {
+    .btn-play,
+    .btn-previous,
+    .btn-next,
+    .waypoint {
         display: block;
     }
 
     .waypoint {
         display: none;
+    }
+
+    .handle,
+    .btn-play,
+    .btn-previous,
+    .btn-next {
+        &:hover {
+            cursor: pointer;
+        }
+        &:active {
+            color: red;
+        }
     }
 
     .btn-play {
@@ -160,17 +199,17 @@ nav {
         -webkit-transform-origin: 0% 0%;
         position: relative;
         top: 140px;
-    }
-}
 
-.handle {
-    display: block;
-    position: relative;
-    top: -4px;
-    width: 10px;
-    height: 10px;
-    background-color: @color1;
-    border-radius: 5px;
+        .handle {
+            display: block;
+            position: relative;
+            top: -4px;
+            width: 10px;
+            height: 10px;
+            background-color: @color1;
+            border-radius: 5px;
+        }
+    }
 }
 
 .connexion {
@@ -191,11 +230,13 @@ nav {
     }   
 }
 
-#logo {
-    position: fixed;
-    left: 50%;
-    margin-left: -520px;
-    text-align: right;
-    width: 200px;
-    z-index: 999;
+.previous {
+    &:before {
+        content: '←';
+    }
+}
+
+.karla {
+    font-family: karla;
+    line-height: 22px;
 }
