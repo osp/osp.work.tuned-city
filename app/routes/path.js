@@ -10,8 +10,6 @@ var Cursor = require('../models').Cursor;
 var _ = require('underscore');
 
 exports.path = function(req, res){
-    
-    
     var forwardTrackoints = function(trackpoints, response, ret){
         Connection.find({'_id':{$in:trackpoints}}, function(err, connections){
             if(err){
@@ -23,13 +21,11 @@ exports.path = function(req, res){
                 for(var c in connections){
                     var connection = connections[c].toObject();
                     
-                    // console.log('connection', connection);
                     cursors.push(connection.start);
                     cursors.push(connection.end);
                     
                     ret.trackpoints.push(connection);
                 }
-//                 console.log('ret.trackpoints', ret.trackpoints);
                 Cursor.find({'_id':{$in:cursors}}, function(err, cursors){
                     if(err){
                         // console.warn(err);
@@ -40,8 +36,6 @@ exports.path = function(req, res){
                             var cursor = value.toObject();
                             for(var t in memo)
                             {
-//                                 console.log(t, memo[t].start.toString(), ' === ', cursor._id.toString(), 
-//                                             (memo[t].start.toString()  ===  cursor._id.toString()));
                                 if( !memo[t].start._id
                                     && memo[t].start.toString() === cursor._id.toString())
                                 {
@@ -70,27 +64,16 @@ exports.path = function(req, res){
                                         if(memo[t].start.media.toString() === media._id.toString())
                                         {
                                             memo[t].start.media = media;
-//                                             console.log('>>', memo[t].start.media);
                                         }
                                         if(memo[t].end.media.toString() === media._id.toString())
                                         {
                                             memo[t].end.media = media;
-//                                             console.log('<<', memo[t].end.media);
                                         }
-//                                         console.log('memo', t, memo[t]);
                                     }
                                     return memo;
                                 }, ret.trackpoints);
                                 
-                                
-                                
-//                         console.log('******************************************');
-//                         console.log(ret.trackpoints);
-//                         console.log('******************************************');
-                                
                                 res.render('path_detail', {path: ret});
-                                
-                                
                             }
                         });
                     }
