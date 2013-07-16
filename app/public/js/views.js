@@ -431,7 +431,7 @@
             
             if(node){
                 var media = node.get('media');
-                data.url = media.url;
+                data.url = window.tc.ServerConfig.media_url + media.url;
                 data.type = media.type;
                 
                 if (node.get('annotation').next) {
@@ -481,7 +481,7 @@
                 var mime = node.get('media').type.split('/');
                 var subtype = mime.pop();
                 var media = { };
-                media[subtype] =  node.get('media').url;
+                media[subtype] =  window.tc.ServerConfig.media_url + node.get('media').url;
                 
                 var player = this.$el.find(".player");
                 player.jPlayer({

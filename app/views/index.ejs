@@ -11,9 +11,9 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     
     <script>
-    var tc.Config = {};
+    window.tc= {ServerConfig : {}};
     <% for(var k in config){ %>
-    tc.Config['<%= k %>'] =  '<%= config[k] %>';
+    window.tc.ServerConfig['<%= k %>'] =  '<%= config[k] %>';
     <% } %>
     </script>
     
