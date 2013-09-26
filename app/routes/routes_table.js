@@ -3,8 +3,8 @@
  */
 
 var extend = require('underscore').extend;
-var settings = require('../settings').settings
-
+var wrap = require('underscore').wrap;
+var settings = require('../settings').settings;
 
 
 var api = {

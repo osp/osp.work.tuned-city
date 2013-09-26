@@ -514,13 +514,13 @@
                 
                 player.on($.jPlayer.event.timeupdate, this._timeUpdate.bind(this));
                 
-                $.getJSON('/spectrogram/' + node.get('media').id + '/', function(data) {
-                    that.$el.find('.spectrogram-image').attr('src', data.url);
-                });
-                    
-                $.getJSON('/poster/' + node.get('media').id + '/', function(data) {
-                    that._player.media.poster = data.url
-                });
+//                 $.getJSON('/spectrogram/' + node.get('media').id + '/', function(data) {
+//                     that.$el.find('.spectrogram-image').attr('src', data.url);
+//                 });
+//                     
+//                 $.getJSON('/poster/' + node.get('media').id + '/', function(data) {
+//                     that._player.media.poster = data.url
+//                 });
             }
         },
         loadPath: function(path){
