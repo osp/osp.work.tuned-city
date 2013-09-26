@@ -92,8 +92,13 @@ exports.path = function(req, res){
         .exec(function (err, path) {
             if (err) res.status(500).send(err);
             else{
-                var p = path.toObject();
-                forwardTrackoints(_.clone(p.trackpoints), res, p );
+                try{
+                    var p = path.toObject();
+                    forwardTrackoints(_.clone(p.trackpoints), res, p );
+                }
+                catch(e){
+                    console.log(e);
+                }
             }
 
         });
